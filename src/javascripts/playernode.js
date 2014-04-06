@@ -45,12 +45,12 @@ function moveBot(){
     console.log("Are bombs = " + areBombs);
     console.log("Are Exits = " + areExits);
     console.log("Are VP Blocks = " + areVPBlocks());
-    console.log("Index = " + selectMaxIndex(compassLBlocks, true));
+    console.log("Index = " + selectMaxIndex(compassRisk, true));
     console.log("Position = " + this.x + ", " + this.y);
 
-   /* if(!areBombs && areExits && totalLBlocks>0 && !areVPBlocks()){
+    if(!areBombs && areExits && totalLBlocks>0 && !areVPBlocks()){
         index = selectMaxIndex(compassLBlocks, true);
-        console.log("Entró poner bomba");
+//        console.log("Entró poner bomba");
         switch (index){
             case 0:
                 return (areCloseBlocks(index, "L") ? "BO" : "O");
@@ -68,7 +68,7 @@ function moveBot(){
                 return "P";
         }
     } else {
-        console.log("Entró evitar bomba");
+//        console.log("Entró evitar bomba");
         index = selectMaxIndex(compassRisk, false);
         switch (index){
             case 0:
@@ -86,15 +86,15 @@ function moveBot(){
             default:
                 return "P";
         }
-    }*/
+    }
 
-    var mov=Math.floor(Math.random()*3)+1;
+/*    var mov=Math.floor(Math.random()*3)+1;
     switch(mov){
         case 0: return "N"; break;
         case 1: return "E"; break;
         case 2: return "S"; break;
         case 3: return "O"; break;
-    }
+    }*/
 }
 
 function areVPBlocks(){
@@ -136,10 +136,8 @@ function areCloseBlocks(index, type){
         return true;
     } else if(getNear(newX+1, newY) == type){
         return true;
-    } else if(getNear(newX, newY+1) == type){
-        return true;
     } else {
-        return false;
+        return getNear(newX, newY+1) == type;
     }
 }
 
@@ -150,12 +148,23 @@ function selectMaxIndex(array, selectMax){
 //        console.log(emptyCells);
 //    }
     var i = 0;
-    for(i=0;i<array.length;i++){
-        var index =  selectMax ? index = array.indexOf(calc_max(array)) : index = array.indexOf(calc_min(array));
-        if(emptyCells[index]){
-            return index;
+    var availableArray = [];
+    for(i=0; i<array.length; i++){
+        if(emptyCells[i]){
+            availableArray = availableArray.concat(array[i]);
+            console.log("Primer resultado es: " + availableArray);
         }
     }
+
+    var targetValue =  selectMax ? calc_max(availableArray) : calc_min(availableArray);
+    for(index=0; index<array.length; index++){
+        if(emptyCells[index]){
+            if(targetValue == array[index]){
+                return index;
+            }
+        }
+    }
+
     return -1;
 }
 
