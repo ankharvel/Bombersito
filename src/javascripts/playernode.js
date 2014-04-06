@@ -44,12 +44,13 @@ function moveBot(){
     console.log("Total L Blocks = " + totalLBlocks);
     console.log("Are bombs = " + areBombs);
     console.log("Are Exits = " + areExits);
+    console.log("Are VP Blocks = " + areVPBlocks());
     console.log("Index = " + selectMaxIndex(compassLBlocks, true));
     console.log("Position = " + this.x + ", " + this.y);
 
-/*    if(!areBombs && areExits && totalLBlocks>0 *//*&& !areVPBlocks()*//*){
+   /* if(!areBombs && areExits && totalLBlocks>0 && !areVPBlocks()){
         index = selectMaxIndex(compassLBlocks, true);
-        console.log("Entró poner bomba")
+        console.log("Entró poner bomba");
         switch (index){
             case 0:
                 return (areCloseBlocks(index, "L") ? "BO" : "O");
@@ -62,9 +63,12 @@ function moveBot(){
                 break;
             case 3:
                 return (areCloseBlocks(index, "L") ? "BS" : "S");
+                break;
+            default:
+                return "P";
         }
     } else {
-        console.log("Entró evitar bomba")
+        console.log("Entró evitar bomba");
         index = selectMaxIndex(compassRisk, false);
         switch (index){
             case 0:
@@ -78,6 +82,9 @@ function moveBot(){
                 break;
             case 3:
                 return (compassRisk[index] < 100 ?  "S" : "P");
+                break;
+            default:
+                return "P";
         }
     }*/
 
@@ -143,23 +150,23 @@ function selectMaxIndex(array, selectMax){
 //        console.log(emptyCells);
 //    }
     var i = 0;
-    for(;;){
-        var index =  selectMax ? index = array.indexOf(calc_max(array, i)) : index = array.indexOf(calc_min(array, i));
+    for(i=0;i<array.length;i++){
+        var index =  selectMax ? index = array.indexOf(calc_max(array)) : index = array.indexOf(calc_min(array));
         if(emptyCells[index]){
             return index;
         }
-        i++;
     }
+    return -1;
 }
 
-function calc_max(array, i){
+function calc_max(array){
     var newArray = ([]).concat(array);
-    return newArray.sort()[array.length-1 - i];
+    return newArray.sort()[array.length-1];
 }
 
 function calc_min(array, i){
     var newArray = ([]).concat(array);
-    return newArray.sort()[0 + i];
+    return newArray.sort()[0];
 }
 
 function calc_totals(array) {
@@ -256,8 +263,13 @@ function areBombs(array){
 }
 
 function getNear(x,y) {
-    var rRow = this.rows[y].split(",");
-    return rRow[x];
+    try{
+        var rRow = this.rows[y].split(",");
+        return rRow[x];
+    }catch(err){
+        console.log("Bad argument getNear(" + x + "," + y + ")");
+        return "Error";
+    }
 }
 
 function getValue(cellValue){
@@ -301,7 +313,3 @@ function getValue(cellValue){
             return 10;
     }
 }
-
-
-
-
