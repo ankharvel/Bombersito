@@ -10,15 +10,15 @@ exports.newPlayer = function(){
   return player;
 };
 
-exports.operations = function(){
-    operations = {
-        numer: -1,
-        getCellValue: function(name){
-            numer = getValue(name);
-        }
-    };
-    return operations;
-};
+//exports.operations = function(){
+//    operations = {
+//        numer: -1,
+//        getCellValue: function(name){
+//            numer = getValue(name);
+//        }
+//    };
+//    return operations;
+//};
 
 function moveBot(){
     statistics = {
@@ -27,66 +27,61 @@ function moveBot(){
         compassLBlocks: [],
         emptyCells: [],
         closeBombs: [],
-        lastMov: -1
+        closeTargets: [],
+        nextMov: "",
+        lastMov: ""
     };
     fillStatistics();
 
     var areBombs = booleanResult(closeBombs);
     var areExits = calc_exits(emptyCells);
     var totalLBlocks = calc_totals(compassLBlocks);
-    var index;
+    var totalTargets = calc_totals(closeTargets);
+    var mov;
 
-    console.log("Risk = " + compassRisk);
-    console.log("XBlocks = " + compassXBlocks);
-    console.log("LBlocks = " + compassLBlocks);
-    console.log("EmptyCells = " + emptyCells);
-    console.log("CloseBombs = " + closeBombs);
-    console.log("Total L Blocks = " + totalLBlocks);
-    console.log("Are bombs = " + areBombs);
-    console.log("Are Exits = " + areExits);
-    console.log("Are VP Blocks = " + areVPBlocks());
-    console.log("Index = " + selectMaxIndex(compassRisk, true));
-    console.log("Position = " + this.x + ", " + this.y);
+//    console.log("Risk = " + compassRisk);
+//    console.log("XBlocks = " + compassXBlocks);
+//    console.log("LBlocks = " + compassLBlocks);
+//    console.log("EmptyCells = " + emptyCells);
+//    console.log("CloseBombs = " + closeBombs);
+//    console.log("CloseTargets = " + closeTargets);
+//    console.log("Total L Blocks = " + totalLBlocks);
+//    console.log("Are bombs = " + areBombs);
+//    console.log("Are targets = " + totalTargets>0);
+//    console.log("Are Exits = " + areExits);
+//    console.log("Are VP Blocks = " + areVPBlocks());
+//    console.log("Index = " + selectMaxIndex(compassRisk, true));
+//    console.log("Position = " + this.x + ", " + this.y);
 
-    if(!areBombs && areExits && totalLBlocks>0 && !areVPBlocks()){
-        index = selectMaxIndex(compassLBlocks, true);
-//        console.log("Entró poner bomba");
-        switch (index){
-            case 0:
-                return (areCloseBlocks(index, "L") ? "BO" : "O");
-                break;
-            case 1:
-                return (areCloseBlocks(index, "L") ? "BN" : "N");
-                break;
-            case 2:
-                return (areCloseBlocks(index, "L") ? "BE" : "E");
-                break;
-            case 3:
-                return (areCloseBlocks(index, "L") ? "BS" : "S");
-                break;
-            default:
-                return "P";
-        }
-    } else {
-//        console.log("Entró evitar bomba");
-        index = selectMaxIndex(compassRisk, false);
-        switch (index){
-            case 0:
-                return (compassRisk[index] < 100 ?  "O" : "P");
-                break;
-            case 1:
-                return (compassRisk[index] < 100 ?  "N" : "P");
-                break;
-            case 2:
-                return (compassRisk[index] < 100 ?  "E" : "P");
-                break;
-            case 3:
-                return (compassRisk[index] < 100 ?  "S" : "P");
-                break;
-            default:
-                return "P";
+    if(areBombs){
+        console.log("henMode");
+        return  henMode();
+    }
+
+    if(areVPBlocks()){
+        console.log("greedMode");
+        return greedMode();
+    }
+
+    if(areExits && (totalLBlocks>0 || totalTargets>0)){
+        if(totalTargets>0){
+            console.log("killerMode");
+            return killerMode();
+        } else {
+            console.log("bomberMode");
+            return bomberMode();
         }
     }
+
+    return hunterMode();
+
+//    if(evaluate(mov, this.lastMov) || areBombs){
+//        this.lastMov = mov;
+//        return mov;
+//    } else {
+//        this.lastMov = mov;
+//        return mov;
+//    }
 
 /*    var mov=Math.floor(Math.random()*3)+1;
     switch(mov){
@@ -97,21 +92,124 @@ function moveBot(){
     }*/
 }
 
+function henMode(){
+    var index = selectMaxIndex(compassRisk, false);
+    switch (index){
+        case 0:
+            return (compassRisk[index] < 100 ?  "O" : "P");
+            break;
+        case 1:
+            return (compassRisk[index] < 100 ?  "N" : "P");
+            break;
+        case 2:
+            return (compassRisk[index] < 100 ?  "E" : "P");
+            break;
+        case 3:
+            return (compassRisk[index] < 100 ?  "S" : "P");
+            break;
+        default:
+            return "P";
+    }
+}
+
+function greedMode(){
+    if(this.nextMov != "?"){
+        return this.nextMov;
+    }
+    return henMode();
+}
+
+function bomberMode(){
+    var index = selectMaxIndex(compassLBlocks, true);
+    switch (index){
+        case 0:
+            return (areCloseBlocks(index, /L/) ? "BO" : "O");
+            break;
+        case 1:
+            return (areCloseBlocks(index, /L/) ? "BN" : "N");
+            break;
+        case 2:
+            return (areCloseBlocks(index, /L/) ? "BE" : "E");
+            break;
+        case 3:
+            return (areCloseBlocks(index, /L/) ? "BS" : "S");
+            break;
+        default:
+            return "P";
+    }
+}
+
+function killerMode(){
+    var index = selectMaxIndex(closeTargets, true);
+    switch (index){
+        case 0:
+            return (areCloseBlocks(index, /A|B|C|D/) ? "BO" : "O");
+            break;
+        case 1:
+            return (areCloseBlocks(index, /A|B|C|D/) ? "BN" : "N");
+            break;
+        case 2:
+            return (areCloseBlocks(index, /A|B|C|D/) ? "BE" : "E");
+            break;
+        case 3:
+            return (areCloseBlocks(index, /A|B|C|D/) ? "BS" : "S");
+            break;
+        default:
+            return "P";
+    }
+}
+
+function hunterMode(){
+    var mov=Math.floor(Math.random()*3)+1;
+    switch(mov){
+        case 0: return "N"; break;
+        case 1: return "E"; break;
+        case 2: return "S"; break;
+        case 3: return "O"; break;
+    }
+    return "P";
+}
+
+function evaluate(mov, lastMov){
+    switch (mov){
+        case /P|BO|BN|BE|BS/:
+            return true;
+            break;
+        case "O":
+            return lastMov != "E";
+            break;
+        case "N":
+            return lastMov != "S";
+            break;
+        case "E":
+            return lastMov != "O";
+            break;
+        case "S":
+            return lastMov != "N";
+            break;
+        default:
+            return true;
+
+    }
+}
+
 function areVPBlocks(){
-    return areCloseBlocks(0, "P") ||
-        areCloseBlocks(1, "P") ||
-        areCloseBlocks(2, "P") ||
-        areCloseBlocks(3, "P") ||
-        areCloseBlocks(0, "V") ||
-        areCloseBlocks(1, "V") ||
-        areCloseBlocks(2, "V") ||
-        areCloseBlocks(3, "V");
+    for(var i=-1; i<4; i++){
+        if(areCloseBlocks(i, /P|V/)){
+            return true;
+        }
+    }
+    return false;
 }
 
 function areCloseBlocks(index, type){
     var newX;
     var newY;
     switch (index){
+        case -1:
+            newX = this.x;
+            newY = this.y;
+            break;
         case 0:
             newX = this.x - 1;
             newY = this.y;
@@ -130,29 +228,29 @@ function areCloseBlocks(index, type){
             break;
     }
 
-    if(getNear(newX-1, newY) == type){
+    if(type.test(getNear(newX-1, newY))){
+        this.nextMov = (index == -1 ? "O" : "?");
         return true;
-    } else if(getNear(newX, newY-1) == type){
+    } else if(type.test(getNear(newX, newY-1))){
+        this.nextMov = (index == -1 ? "N" : "?");
         return true;
-    } else if(getNear(newX+1, newY) == type){
+    } else if(type.test(getNear(newX+1, newY))){
+        this.nextMov = (index == -1 ? "E" : "?");
+        return true;
+    } else if(type.test(getNear(newX, newY+1))){
+        this.nextMov = (index == -1 ? "S" : "?");
         return true;
     } else {
-        return getNear(newX, newY+1) == type;
+        return false;
     }
 }
 
 function selectMaxIndex(array, selectMax){
-//    if(!booleanResult(closeBombs) && statistics.lastMov != -1 && calc_exits(emptyCells)){
-//        var oppositeIndex = statistics.lastMov < 2 ? statistics.lastMov + 2 : statistics.lastMov - 2;
-//        emptyCells[oppositeIndex] = false;
-//        console.log(emptyCells);
-//    }
     var i = 0;
     var availableArray = [];
     for(i=0; i<array.length; i++){
         if(emptyCells[i]){
             availableArray = availableArray.concat(array[i]);
-            console.log("Primer resultado es: " + availableArray);
         }
     }
 
@@ -223,12 +321,17 @@ function fillStatistics(){
     closeBombs = new Array(
         areBombs(wCells), areBombs(nCells), areBombs(eCells), areBombs(sCells)
     );
+
+    closeTargets = new Array(
+        getTargets(wCells), getTargets(nCells), getTargets(eCells), getTargets(sCells)
+    );
 }
 
 function getTotalByParameter(array, parameter){
     var xArray = new Array(array[0], array[1], array[2]);
     var yArray = new Array(array[3], array[4], array[5]);
     var bombRegex = /1|2|3/;
+    var targetRegex = /A|B|C|D/;
     var result = 0;
 
     for(var i=0; i<xArray.length; i++){
@@ -241,6 +344,11 @@ function getTotalByParameter(array, parameter){
                         break;
                     case "Bombs":
                         if(bombRegex.test(cellData)){
+                            result += 1;
+                        }
+                        break;
+                    case "Targets":
+                        if(targetRegex.test(cellData)){
                             result += 1;
                         }
                         break;
@@ -269,6 +377,10 @@ function getLBlocks(array){
 
 function areBombs(array){
     return getTotalByParameter(array, "Bombs") > 0;
+}
+
+function getTargets(array){
+    return getTotalByParameter(array, "Targets");
 }
 
 function getNear(x,y) {
@@ -305,7 +417,7 @@ function getValue(cellValue){
         case "B":
         case "C":
         case "D":
-            return 8;
+            return 2;
             break;
         case "3":
         case "2":
