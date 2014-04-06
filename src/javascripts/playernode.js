@@ -31,22 +31,23 @@ function moveBot(){
     };
     fillStatistics();
 
+    var areBombs = booleanResult(closeBombs);
+    var areExits = calc_exits(emptyCells);
+    var totalLBlocks = calc_totals(compassLBlocks);
+    var index;
+
     console.log("Risk = " + compassRisk);
     console.log("XBlocks = " + compassXBlocks);
     console.log("LBlocks = " + compassLBlocks);
     console.log("EmptyCells = " + emptyCells);
     console.log("CloseBombs = " + closeBombs);
-    console.log("Total L Blocks = " + calc_totals(compassLBlocks));
-    console.log("Boolean Bombs = " + booleanResult(closeBombs));
-    console.log("Total Exits = " + calc_exits(emptyCells));
+    console.log("Total L Blocks = " + totalLBlocks);
+    console.log("Are bombs = " + areBombs);
+    console.log("Are Exits = " + areExits);
     console.log("Index = " + selectMaxIndex(compassLBlocks, true));
     console.log("Position = " + this.x + ", " + this.y);
 
-    var notBombs = !booleanResult(closeBombs);
-    var areExits = calc_exits(emptyCells);
-    var areLBlocks = calc_totals(compassLBlocks);
-    var index;
-    if(!notBombs && areExits && areLBlocks /*&& !areVPBlocks()*/){
+/*    if(!areBombs && areExits && totalLBlocks>0 *//*&& !areVPBlocks()*//*){
         index = selectMaxIndex(compassLBlocks, true);
         console.log("Entró poner bomba")
         switch (index){
@@ -78,6 +79,14 @@ function moveBot(){
             case 3:
                 return (compassRisk[index] < 100 ?  "S" : "P");
         }
+    }*/
+
+    var mov=Math.floor(Math.random()*3)+1;
+    switch(mov){
+        case 0: return "N"; break;
+        case 1: return "E"; break;
+        case 2: return "S"; break;
+        case 3: return "O"; break;
     }
 }
 

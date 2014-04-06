@@ -38,7 +38,7 @@ exports.newPlayer = function(){
               break;
           case 4:
 //              return "BN";
-              return "N"
+              return "N";
               break;
           case 5:
               return "BE";
@@ -49,8 +49,8 @@ exports.newPlayer = function(){
               return "S";
               break;
           case 7:
-//              return "BO";
-              return "O";
+              return "BO";
+//              return "O";
               break;
           }
     }
