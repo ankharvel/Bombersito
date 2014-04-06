@@ -15,7 +15,7 @@ client.on('data', function(data) {
     switch(info[0]){
         case "EMPEZO":
             //leemos el mapa incial y nuestra letra
-            console.log("Mi letra: " + info[2]);
+            console.log("Mi letra__________________: " + info[2]);
             bot.letter = info[2];
             bot.updateMap(info[1]);
             break;
@@ -23,6 +23,7 @@ client.on('data', function(data) {
             console.log(info[1]);
             bot.updateMap(info[2]);
             var mov= bot.move();
+            console.log("Siguiente: " + mov);
             client.write(mov);
             break;
         case "PERDIO":

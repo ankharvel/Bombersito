@@ -4,11 +4,18 @@ exports.newPlayer = function(){
         y:-1,
         letter:"Z",
         rows:[],
+        lastMov:"",
         updateMap:function(data){updateChart(data, this.letter)},
-        move:function(){return moveBot()}
+        move:function(){return superMoveBot()}
   };
   return player;
 };
+
+function superMoveBot(){
+    var mov = evaluate(moveBot());
+    this.lastMov = mov;
+    return mov;
+}
 
 //exports.operations = function(){
 //    operations = {
@@ -28,8 +35,7 @@ function moveBot(){
         emptyCells: [],
         closeBombs: [],
         closeTargets: [],
-        nextMov: "",
-        lastMov: ""
+        nextMov: ""
     };
     fillStatistics();
 
@@ -39,10 +45,10 @@ function moveBot(){
     var totalTargets = calc_totals(closeTargets);
     var mov;
 
-//    console.log("Risk = " + compassRisk);
+    console.log("Risk = " + compassRisk);
 //    console.log("XBlocks = " + compassXBlocks);
 //    console.log("LBlocks = " + compassLBlocks);
-//    console.log("EmptyCells = " + emptyCells);
+    console.log("EmptyCells = " + emptyCells);
 //    console.log("CloseBombs = " + closeBombs);
 //    console.log("CloseTargets = " + closeTargets);
 //    console.log("Total L Blocks = " + totalLBlocks);
@@ -54,34 +60,22 @@ function moveBot(){
 //    console.log("Position = " + this.x + ", " + this.y);
 
     if(areBombs){
-        console.log("henMode");
         return  henMode();
     }
 
     if(areVPBlocks()){
-        console.log("greedMode");
         return greedMode();
     }
 
     if(areExits && (totalLBlocks>0 || totalTargets>0)){
         if(totalTargets>0){
-            console.log("killerMode");
             return killerMode();
         } else {
-            console.log("bomberMode");
             return bomberMode();
         }
     }
 
     return hunterMode();
-
-//    if(evaluate(mov, this.lastMov) || areBombs){
-//        this.lastMov = mov;
-//        return mov;
-//    } else {
-//        this.lastMov = mov;
-//        return mov;
-//    }
 
 /*    var mov=Math.floor(Math.random()*3)+1;
     switch(mov){
@@ -93,6 +87,7 @@ function moveBot(){
 }
 
 function henMode(){
+    console.log("henMode");
     var index = selectMaxIndex(compassRisk, false);
     switch (index){
         case 0:
@@ -113,6 +108,7 @@ function henMode(){
 }
 
 function greedMode(){
+    console.log("greedMode");
     if(this.nextMov != "?"){
         return this.nextMov;
     }
@@ -120,6 +116,7 @@ function greedMode(){
 }
 
 function bomberMode(){
+    console.log("bomberMode");
     var index = selectMaxIndex(compassLBlocks, true);
     switch (index){
         case 0:
@@ -140,6 +137,7 @@ function bomberMode(){
 }
 
 function killerMode(){
+    console.log("killerMode");
     var index = selectMaxIndex(closeTargets, true);
     switch (index){
         case 0:
@@ -160,36 +158,61 @@ function killerMode(){
 }
 
 function hunterMode(){
-    var mov=Math.floor(Math.random()*3)+1;
+    console.log("hunterMode");
+    if(areCloseBlocks(-1, /_/)){
+        console.log("Moving to empty space");
+        return this.nextMov;
+    }
+    return "P";
+/*    var mov=Math.floor(Math.random()*3)+1;
     switch(mov){
         case 0: return "N"; break;
         case 1: return "E"; break;
         case 2: return "S"; break;
         case 3: return "O"; break;
     }
-    return "P";
+    return "P";*/
 }
 
-function evaluate(mov, lastMov){
-    switch (mov){
-        case /P|BO|BN|BE|BS/:
-            return true;
-            break;
-        case "O":
-            return lastMov != "E";
-            break;
-        case "N":
-            return lastMov != "S";
-            break;
-        case "E":
-            return lastMov != "O";
-            break;
-        case "S":
-            return lastMov != "N";
-            break;
-        default:
-            return true;
+function evaluate(mov){
+    console.log("anterior: " + this.lastMov);
+    var areBombs = booleanResult(closeBombs);
+    var areExits = calc_exits(emptyCells);
+    if(!areBombs && areExits){
+        switch (mov){
+            case "P":
+                return mov;
+                break;
+            case "BO":
+                return mov;
+                break;
+            case "BN":
+                return mov;
+                break;
+            case "BE":
+                return mov;
+                break;
+            case "BS":
+                return mov;
+                break;
+            case "O":
+                return this.lastMov != "E" ? mov : hunterMode();
+                break;
+            case "N":
+                return this.lastMov != "S" ? mov : hunterMode();
+                break;
+            case "E":
+                return this.lastMov != "O" ? mov : hunterMode();
+                break;
+            case "S":
+                return this.lastMov != "N" ? mov : hunterMode();
+                break;
+            default:
+                return mov;
 
+        }
+    } else {
+        return mov;
     }
 }
 
