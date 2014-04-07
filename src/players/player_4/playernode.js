@@ -41,16 +41,16 @@ exports.newPlayer = function(){
               return "N";
               break;
           case 5:
-              return "BE";
-//              return "E";
+//              return "BE";
+              return "E";
               break;
           case 6:
 //              return "BS";
               return "S";
               break;
           case 7:
-              return "BO";
-//              return "O";
+//              return "BO";
+              return "O";
               break;
           }
     }

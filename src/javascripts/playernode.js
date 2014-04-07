@@ -5,6 +5,7 @@ exports.newPlayer = function(){
         letter:"Z",
         rows:[],
         lastMov:"",
+        countDown: -1,
         updateMap:function(data){updateChart(data, this.letter)},
         move:function(){return superMoveBot()}
   };
@@ -16,16 +17,6 @@ function superMoveBot(){
     this.lastMov = mov;
     return mov;
 }
-
-//exports.operations = function(){
-//    operations = {
-//        numer: -1,
-//        getCellValue: function(name){
-//            numer = getValue(name);
-//        }
-//    };
-//    return operations;
-//};
 
 function moveBot(){
     statistics = {
@@ -43,9 +34,8 @@ function moveBot(){
     var areExits = calc_exits(emptyCells);
     var totalLBlocks = calc_totals(compassLBlocks);
     var totalTargets = calc_totals(closeTargets);
-    var mov;
 
-    console.log("Risk = " + compassRisk);
+//    console.log("Risk = " + compassRisk);
 //    console.log("XBlocks = " + compassXBlocks);
 //    console.log("LBlocks = " + compassLBlocks);
     console.log("EmptyCells = " + emptyCells);
@@ -58,32 +48,28 @@ function moveBot(){
 //    console.log("Are VP Blocks = " + areVPBlocks());
 //    console.log("Index = " + selectMaxIndex(compassRisk, true));
 //    console.log("Position = " + this.x + ", " + this.y);
-
+    findTarget();
     if(areBombs){
+        this.countDown = 0;
         return  henMode();
     }
 
-    if(areVPBlocks()){
-        return greedMode();
-    }
+    if(this.countDown<=0){
+        if(areVPBlocks()){
+            return greedMode();
+        }
 
-    if(areExits && (totalLBlocks>0 || totalTargets>0)){
-        if(totalTargets>0){
-            return killerMode();
-        } else {
-            return bomberMode();
+        if(areExits && (totalLBlocks>0 || totalTargets>0)){
+            if(totalTargets>0){
+                return killerMode();
+            } else {
+                return bomberMode();
+            }
         }
     }
 
     return hunterMode();
 
-/*    var mov=Math.floor(Math.random()*3)+1;
-    switch(mov){
-        case 0: return "N"; break;
-        case 1: return "E"; break;
-        case 2: return "S"; break;
-        case 3: return "O"; break;
-    }*/
 }
 
 function henMode(){
@@ -159,19 +145,50 @@ function killerMode(){
 
 function hunterMode(){
     console.log("hunterMode");
-    if(areCloseBlocks(-1, /_/)){
-        console.log("Moving to empty space");
-        return this.nextMov;
+    if(this.countDown<=0){
+        this.countDown = 3;
+    } else {
+        this.countDown--;
     }
+
+    var targetPos = findTarget();
+    console.log(targetPos);
+
+    var compassOrder = [];
+    if(this.x <= targetPos[1] && this.y <= targetPos[2]){
+        compassOrder = [2,3,0,1];
+    } else if(this.x <= targetPos[1] && this.y > targetPos[2]){
+        compassOrder = [1,2,3,0];
+    } else if(this.x > targetPos[1] && this.y <= targetPos[2]){
+        compassOrder = [3,0,1,2];
+    } else if(this.x > targetPos[1] && this.y > targetPos[2]){
+        compassOrder = [0,1,2,3];
+    }
+
+    for(var i=0; i<4; i++){
+        if(emptyCells[compassOrder[i]]){
+            switch (compassOrder[i]){
+                case 0:
+                    return "O";
+                    break;
+                case 1:
+                    return "N";
+                    break;
+                case 2:
+                    return "E";
+                    break;
+                case 3:
+                    return "S";
+                    break;
+            }
+        }
+    }
+
+//    if(areCloseBlocks(-1, /_/)){
+//        console.log("Moving to empty space");
+//        return this.nextMov;
+//    }
     return "P";
-/*    var mov=Math.floor(Math.random()*3)+1;
-    switch(mov){
-        case 0: return "N"; break;
-        case 1: return "E"; break;
-        case 2: return "S"; break;
-        case 3: return "O"; break;
-    }
-    return "P";*/
 }
 
 function evaluate(mov){
@@ -209,7 +226,6 @@ function evaluate(mov){
                 break;
             default:
                 return mov;
-
         }
     } else {
         return mov;
@@ -312,10 +328,29 @@ function calc_exits(array) {
 }
 
 function updateChart(data, letter){
+    this.data = data;
+    this.letter = letter;
     this.rows = data.split("\n");
     var pos = data.indexOf(letter)/2;
     this.y = Math.floor(pos/this.rows.length);
     this.x = pos%(this.rows).length;
+    this.countDown = 0;
+}
+
+function findTarget(){
+    targets = ["A", "B", "C", "D"];
+    targetPos = [];
+    for(var i=0; i<4; i++){
+        if(targets[i] != this.letter){
+            var pos = this.data.indexOf(targets[i])/2;
+            var posX = pos%(this.rows).length;
+            if(posX >= 0 ){
+                var posY = Math.floor(pos/this.rows.length);
+                targetPos = targetPos.concat([targets[i], posX, posY]);
+            }
+        }
+    }
+    return targetPos;
 }
 
 function fillStatistics(){
