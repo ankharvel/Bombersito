@@ -7,14 +7,14 @@ exports.newPlayer = function(){
         lastMov:"",
         countDown: -1,
         bombDown: -1,
-        updatePower:function(){updatePower2()},
+        updatePower:function(){initialize()},
         updateMap:function(data){updateChart(data, this.letter)},
         move:function(){return superMoveBot()}
   };
   return player;
 };
 
-function updatePower2(){
+function initialize(){
     this.bombDown = 0;
     this.countDown = 0;
 }
@@ -22,6 +22,7 @@ function updatePower2(){
 function superMoveBot(){
     var mov = evaluate(moveBot());
     this.lastMov = mov;
+    console.log("Soy__: " + this.letter + " ___voy: " + mov);
     return mov;
 }
 
@@ -55,13 +56,11 @@ function moveBot(){
 //    console.log("Are VP Blocks = " + areVPBlocks());
 //    console.log("Index = " + selectMaxIndex(compassRisk, true));
 //    console.log("Position = " + this.x + ", " + this.y);
-    console.log("Yo soy: " + this.letter);
     console.log(this.data);
     findTarget();
 
-
     if(this.countDown > 0){
-        henMode();
+        return hunterMode();
     }
 
     if(areBombs){
@@ -97,37 +96,37 @@ function henMode(){
     }
 
     var index = selectMaxIndex(compassRisk, false);
-    var pathCount = 0;
-    return findNewPath(index, pathCount);
+    return findNewPath(index);
 }
 
-function findNewPath(index, pathCount){
+function findNewPath(index){
     var result = "P";
-    while(pathCount <= 4){
-        pathCount++;
-        switch (index){
-            case 0:
-                result = (compassRisk[index] < 100 ?  "O" : findNewPath(1));
-                break;
-            case 1:
-                result = (compassRisk[index] < 100 ?  "N" : findNewPath(2));
-                break;
-            case 2:
-                result = (compassRisk[index] < 100 ?  "E" : findNewPath(3));
-                break;
-            case 3:
-                result = (compassRisk[index] < 100 ?  "S" : findNewPath(0));
-                break;
-            default:
-                result = "P";
-                break;
-        }
+    switch (index){
+        case 0:
+            console.log("Case 0");
+            result = (compassRisk[index] < 100 ?  "O" : findNewPath(1));
+            break;
+        case 1:
+            console.log("Case 1");
+            result = (compassRisk[index] < 100 ?  "N" : findNewPath(2));
+            break;
+        case 2:
+            console.log("Case 2");
+            result = (compassRisk[index] < 100 ?  "E" : findNewPath(3));
+            break;
+        case 3:
+            console.log("Case 3");
+            result = (compassRisk[index] < 100 ?  "S" : "P");
+            break;
+        default:
+            result = "P";
+            break;
     }
     return result;
 }
 
 function greedMode(){
-//    console.log("greedMode");
+    console.log("greedMode");
     if(this.nextMov != "?"){
         return this.nextMov;
     }
@@ -135,7 +134,7 @@ function greedMode(){
 }
 
 function bomberMode(){
-//    console.log("bomberMode");
+    console.log("bomberMode");
     var index = selectMaxIndex(compassLBlocks, true);
     switch (index){
         case 0:
@@ -156,7 +155,7 @@ function bomberMode(){
 }
 
 function killerMode(){
-//    console.log("killerMode");
+    console.log("killerMode");
     var index = selectMaxIndex(closeTargets, true);
     switch (index){
         case 0:
@@ -177,9 +176,15 @@ function killerMode(){
 }
 
 function hunterMode(){
-//    console.log("hunterMode");
+    console.log("hunterMode");
     if(this.countDown<=0){
         this.countDown = 3;
+    } else if(calc_totals(closeTargets)>0){
+        console.log("Encontre competencia");
+        if(calc_exits(emptyCells)){
+            this.countDown = 0;
+            return killerMode();
+        }
     } else {
         this.countDown--;
     }
@@ -223,7 +228,7 @@ function evaluate(mov){
 //    console.log("anterior: " + this.lastMov);
     var areBombs = booleanResult(closeBombs);
     var areExits = calc_exits(emptyCells);
-    if(!areBombs && areExits){
+    if(!areBombs && areExits && this.bombDown <= 0){
         switch (mov){
             case "P":
                 return mov;
@@ -483,7 +488,6 @@ function getNear(x,y) {
         var rRow = this.rows[y].split(",");
         return rRow[x];
     }catch(err){
-//        console.log("Bad argument getNear(" + x + "," + y + ")");
         return "Error";
     }
 }
@@ -503,10 +507,10 @@ function getValue(cellValue){
             return 1;
             break;
         case "V":
-            return 0;
+            return -10;
             break;
         case "P":
-            return 0;
+            return -10;
             break;
         case "A":
         case "B":
@@ -516,6 +520,7 @@ function getValue(cellValue){
             break;
         case "3":
         case "2":
+            return 50;
         case "1":
             return 100;
             break;
