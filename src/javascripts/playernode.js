@@ -20,8 +20,8 @@ function initialize(){
         pUser: "",
         pDate: ""
     };
-    pMode = false;
-    pUser = false;
+    pMode = true;
+    pUser = true;
     pDate = false;
     this.bombDown = 0;
     this.countDown = 0;
@@ -239,22 +239,37 @@ function evaluate(mov){
                 return mov;
                 break;
             case "O":
-                return this.lastMov != "E" ? mov : findNewPath(1);
+                return this.lastMov != "E" && anyFarRisk(this.x-1, this.y) ? mov : findNewPath(1);
                 break;
             case "N":
-                return this.lastMov != "S" ? mov : findNewPath(2);
+                return this.lastMov != "S" && anyFarRisk(this.x, this.y-1) ? mov : findNewPath(2);
                 break;
             case "E":
-                return this.lastMov != "O" ? mov : findNewPath(3);
+                return this.lastMov != "O" && anyFarRisk(this.x+1, this.y) ? mov : findNewPath(3);
                 break;
             case "S":
-                return this.lastMov != "N" ? mov : findNewPath(0);
+                return this.lastMov != "N" && anyFarRisk(this.x, this.y+1) ? mov : findNewPath(0);
                 break;
             default:
                 return mov;
         }
     } else {
-        return mov;
+        switch (mov){
+            case "O":
+                return anyFarRisk(this.x-1, this.y) ? mov : findNewPath(1);
+                break;
+            case "N":
+                return anyFarRisk(this.x, this.y-1) ? mov : findNewPath(2);
+                break;
+            case "E":
+                return anyFarRisk(this.x+1, this.y) ? mov : findNewPath(3);
+                break;
+            case "S":
+                return anyFarRisk(this.x, this.y+1) ? mov : findNewPath(0);
+                break;
+            default:
+                return mov;
+        }
     }
 }
 
@@ -485,6 +500,17 @@ function getNear(x,y) {
     }
 }
 
+function anyFarRisk(posX, posY){
+    var bombRegex = /1/;
+    var bombArray = [
+        bombRegex.test(getNear(posX-2, posY)),
+        bombRegex.test(getNear(posX, posY-2)),
+        bombRegex.test(getNear(posX+2, posY)),
+        bombRegex.test(getNear(posX, posY+2))
+    ];
+    return !booleanResult(bombArray);
+}
+
 function getValue(cellValue) {
     switch (cellValue) {
         case "X":
@@ -543,6 +569,7 @@ function printConsole(areBombs, areExits, totalLBlocks, totalTargets){
 //    console.log("Index = " + selectMaxIndex(compassRisk, true));
 //    console.log("Position = " + this.x + ", " + this.y);
 //    console.log("Last movement: " + this.lastMov);
-//    console.log(this.data);
+    console.log(this.data);
+    console.log("Count down: " + this.countDown);
 }
 
