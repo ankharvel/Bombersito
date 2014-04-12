@@ -6,11 +6,18 @@ exports.newPlayer = function(){
         rows:[],
         lastMov:"",
         countDown: -1,
+        bombDown: -1,
+        updatePower:function(){updatePower2()},
         updateMap:function(data){updateChart(data, this.letter)},
         move:function(){return superMoveBot()}
   };
   return player;
 };
+
+function updatePower2(){
+    this.bombDown = 0;
+    this.countDown = 0;
+}
 
 function superMoveBot(){
     var mov = evaluate(moveBot());
@@ -35,10 +42,10 @@ function moveBot(){
     var totalLBlocks = calc_totals(compassLBlocks);
     var totalTargets = calc_totals(closeTargets);
 
-//    console.log("Risk = " + compassRisk);
+    console.log("Risk = " + compassRisk);
 //    console.log("XBlocks = " + compassXBlocks);
 //    console.log("LBlocks = " + compassLBlocks);
-    console.log("EmptyCells = " + emptyCells);
+//    console.log("EmptyCells = " + emptyCells);
 //    console.log("CloseBombs = " + closeBombs);
 //    console.log("CloseTargets = " + closeTargets);
 //    console.log("Total L Blocks = " + totalLBlocks);
@@ -48,9 +55,20 @@ function moveBot(){
 //    console.log("Are VP Blocks = " + areVPBlocks());
 //    console.log("Index = " + selectMaxIndex(compassRisk, true));
 //    console.log("Position = " + this.x + ", " + this.y);
+    console.log("Yo soy: " + this.letter);
+    console.log(this.data);
     findTarget();
+
+
+    if(this.countDown > 0){
+        henMode();
+    }
+
     if(areBombs){
         this.countDown = 0;
+        if(this.bombDown <= 0){
+            this.bombDown = 2;
+        }
         return  henMode();
     }
 
@@ -74,27 +92,42 @@ function moveBot(){
 
 function henMode(){
     console.log("henMode");
-    var index = selectMaxIndex(compassRisk, false);
-    switch (index){
-        case 0:
-            return (compassRisk[index] < 100 ?  "O" : "P");
-            break;
-        case 1:
-            return (compassRisk[index] < 100 ?  "N" : "P");
-            break;
-        case 2:
-            return (compassRisk[index] < 100 ?  "E" : "P");
-            break;
-        case 3:
-            return (compassRisk[index] < 100 ?  "S" : "P");
-            break;
-        default:
-            return "P";
+    if(this.bombDown > 0){
+        this.bombDown--;
     }
+
+    var index = selectMaxIndex(compassRisk, false);
+    var pathCount = 0;
+    return findNewPath(index, pathCount);
+}
+
+function findNewPath(index, pathCount){
+    var result = "P";
+    while(pathCount <= 4){
+        pathCount++;
+        switch (index){
+            case 0:
+                result = (compassRisk[index] < 100 ?  "O" : findNewPath(1));
+                break;
+            case 1:
+                result = (compassRisk[index] < 100 ?  "N" : findNewPath(2));
+                break;
+            case 2:
+                result = (compassRisk[index] < 100 ?  "E" : findNewPath(3));
+                break;
+            case 3:
+                result = (compassRisk[index] < 100 ?  "S" : findNewPath(0));
+                break;
+            default:
+                result = "P";
+                break;
+        }
+    }
+    return result;
 }
 
 function greedMode(){
-    console.log("greedMode");
+//    console.log("greedMode");
     if(this.nextMov != "?"){
         return this.nextMov;
     }
@@ -102,7 +135,7 @@ function greedMode(){
 }
 
 function bomberMode(){
-    console.log("bomberMode");
+//    console.log("bomberMode");
     var index = selectMaxIndex(compassLBlocks, true);
     switch (index){
         case 0:
@@ -123,7 +156,7 @@ function bomberMode(){
 }
 
 function killerMode(){
-    console.log("killerMode");
+//    console.log("killerMode");
     var index = selectMaxIndex(closeTargets, true);
     switch (index){
         case 0:
@@ -144,7 +177,7 @@ function killerMode(){
 }
 
 function hunterMode(){
-    console.log("hunterMode");
+//    console.log("hunterMode");
     if(this.countDown<=0){
         this.countDown = 3;
     } else {
@@ -152,7 +185,7 @@ function hunterMode(){
     }
 
     var targetPos = findTarget();
-    console.log(targetPos);
+//    console.log(targetPos);
 
     var compassOrder = [];
     if(this.x <= targetPos[1] && this.y <= targetPos[2]){
@@ -183,16 +216,11 @@ function hunterMode(){
             }
         }
     }
-
-//    if(areCloseBlocks(-1, /_/)){
-//        console.log("Moving to empty space");
-//        return this.nextMov;
-//    }
     return "P";
 }
 
 function evaluate(mov){
-    console.log("anterior: " + this.lastMov);
+//    console.log("anterior: " + this.lastMov);
     var areBombs = booleanResult(closeBombs);
     var areExits = calc_exits(emptyCells);
     if(!areBombs && areExits){
@@ -334,7 +362,6 @@ function updateChart(data, letter){
     var pos = data.indexOf(letter)/2;
     this.y = Math.floor(pos/this.rows.length);
     this.x = pos%(this.rows).length;
-    this.countDown = 0;
 }
 
 function findTarget(){
@@ -354,40 +381,50 @@ function findTarget(){
 }
 
 function fillStatistics(){
-    var wCells = new Array(this.x-1, this.x-2, -1, this.y-1, this.y, this.y+1);
-    var nCells = new Array(this.x-1, this.x, this.x+1, this.y-1, this.y-2, -1);
-    var eCells = new Array(this.x+1, this.x+2, -1, this.y-1, this.y, this.y+1);
-    var sCells = new Array(this.x-1, this.x, this.x+1, this.y+1, this.y+2, -1);
+    var wCells = [this.x-1, this.x-2, -1, this.y-1, this.y, this.y+1];
+    var nCells = [this.x-1, this.x, this.x+1, this.y-1, this.y-2, -1];
+    var eCells = [this.x+1, this.x+2, -1, this.y-1, this.y, this.y+1];
+    var sCells = [this.x-1, this.x, this.x+1, this.y+1, this.y+2, -1];
     var emptyRegex = /_|#|a|b|c|d|V|P/;
 
-    compassRisk = new Array(
-        getRisk(wCells), getRisk(nCells), getRisk(eCells), getRisk(sCells)
-    );
-    compassXBlocks = new Array(
+    if(this.bombDown == 1){
+        compassRisk = [
+            this.lastMov == "E" ? getRisk(wCells) + 100: getRisk(wCells),
+            this.lastMov == "S" ? getRisk(nCells) + 100: getRisk(nCells),
+            this.lastMov == "O" ? getRisk(eCells) + 100: getRisk(eCells),
+            this.lastMov == "N" ? getRisk(sCells) + 100: getRisk(sCells)
+        ];
+    } else {
+        compassRisk = [
+            getRisk(wCells), getRisk(nCells), getRisk(eCells), getRisk(sCells)
+        ];
+    }
+
+    compassXBlocks = [
         getXBlocks(wCells), getXBlocks(nCells), getXBlocks(eCells), getXBlocks(sCells)
-    );
-    compassLBlocks = new Array(
+    ];
+    compassLBlocks = [
         getLBlocks(wCells), getLBlocks(nCells), getLBlocks(eCells), getLBlocks(sCells)
-    );
-    emptyCells = new Array(
+    ];
+    emptyCells = [
         emptyRegex.test(getNear(this.x-1, this.y)),
         emptyRegex.test(getNear(this.x, this.y-1)),
         emptyRegex.test(getNear(this.x+1, this.y)),
         emptyRegex.test(getNear(this.x, this.y+1))
-    );
+    ];
 
-    closeBombs = new Array(
+    closeBombs = [
         areBombs(wCells), areBombs(nCells), areBombs(eCells), areBombs(sCells)
-    );
+    ];
 
-    closeTargets = new Array(
+    closeTargets = [
         getTargets(wCells), getTargets(nCells), getTargets(eCells), getTargets(sCells)
-    );
+    ];
 }
 
 function getTotalByParameter(array, parameter){
-    var xArray = new Array(array[0], array[1], array[2]);
-    var yArray = new Array(array[3], array[4], array[5]);
+    var xArray = [array[0], array[1], array[2]];
+    var yArray = [array[3], array[4], array[5]];
     var bombRegex = /1|2|3/;
     var targetRegex = /A|B|C|D/;
     var result = 0;
@@ -446,7 +483,7 @@ function getNear(x,y) {
         var rRow = this.rows[y].split(",");
         return rRow[x];
     }catch(err){
-        console.log("Bad argument getNear(" + x + "," + y + ")");
+//        console.log("Bad argument getNear(" + x + "," + y + ")");
         return "Error";
     }
 }

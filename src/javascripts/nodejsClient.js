@@ -15,8 +15,8 @@ client.on('data', function(data) {
     switch(info[0]){
         case "EMPEZO":
             //leemos el mapa incial y nuestra letra
-            console.log("Mi letra__________________: " + info[2]);
             bot.letter = info[2];
+            bot.updatePower();
             bot.updateMap(info[1]);
             break;
         case "TURNO":
