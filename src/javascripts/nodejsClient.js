@@ -23,7 +23,6 @@ client.on('data', function(data) {
             console.log(info[1]);
             bot.updateMap(info[2]);
             var mov= bot.move();
-//            console.log("Siguiente: " + mov);
             client.write(mov);
             break;
         case "PERDIO":
