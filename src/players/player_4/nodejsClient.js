@@ -17,6 +17,7 @@ client.on('data', function(data) {
         case "EMPEZO":
             //leemos el mapa incial y nuestra letra
             bot.letter = info[2];
+            bot.updatePower();
             bot.updateMap(info[1]);
             break;
         case "TURNO":
