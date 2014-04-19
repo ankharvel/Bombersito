@@ -1,23 +1,17 @@
-var assert = require('../nodeunit/lib/assert'),
-    async = require('../nodeunit/deps/async'),
-    nodeunit = require('../nodeunit/lib/nodeunit'),
-    playernode = require('../../src/javascripts/playernode.js');
+module ("Temperature conversion")
 
-var bot = playernode.newPlayer();
+test("conversion to F", function(){
+    var actual1 = convertFromCelsiusToFahrenheit(20);
+    equal(actual1, 68, "Value not correct");
 
-module.exports = {
-    'Test 1' : function(test) {
-        test.expect(1);
-        test.ok(true, "This shouldn't fail");
-        test.done();
-    },
-    'Test 2' : function(test) {
-        test.expect(2);
-        test.ok(1 === 1, "This shouldn't fail");
-        test.ok(true, "This should fail"); //false
-        test.done();
-    },
-    'Test 3' : function(test){
-        test.equal(bot.getValue("L"), 1700);
-    }
-};
+    var actual2 = convertFromCelsiusToFahrenheit(30);
+    equal(actual2, 86, "Value not correct");
+})
+
+test("conversion to C", function(){
+    var actual1 = convertFromFahrenheitToCelsius(68);
+    equal(actual1, 20, "Value not correct");
+
+    var actual2 = convertFromFahrenheitToCelsius(86);
+    equal(actual2, 30, "Value not correct");
+})
