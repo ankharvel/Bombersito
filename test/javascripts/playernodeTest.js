@@ -4,11 +4,6 @@ var assert = require('../nodeunit/lib/assert'),
     playernode = require('../../src/javascripts/playernode.js');
 
 var bot = playernode.newPlayer();
-var operations = playernode.operations();
-
-exports.testGetValue = function(test){
-    test.equal(bot.getValue("L"), 17);
-};
 
 module.exports = {
     'Test 1' : function(test) {
@@ -23,8 +18,6 @@ module.exports = {
         test.done();
     },
     'Test 3' : function(test){
-        var numero = operations.getCellValue("L");
-        var numer = operations.numer;
-        test.equal(operations.getCellValue("L"), 26);
+        test.equal(bot.getValue("L"), 1700);
     }
 };
