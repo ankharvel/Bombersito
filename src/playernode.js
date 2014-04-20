@@ -1,18 +1,28 @@
-exports.newPlayer = function(){
-    player = {
-        x:-1,
-        y:-1,
-        letter:"Z",
-        rows:[],
-        lastMov:"",
-        countDown: -1,
-        bombDown: -1,
-        updatePower:function(){initialize()},
-        updateMap:function(data){updateChart(data, this.letter)},
-        move:function(){return superMoveBot()}
-  };
-  return player;
-};
+try {
+    exports.newPlayer = function () {
+        player = {
+            x: -1,
+            y: -1,
+            letter: "Z",
+            rows: [],
+            lastMov: "",
+            countDown: -1,
+            bombDown: -1,
+            updatePower: function () {
+                initialize()
+            },
+            updateMap: function (data) {
+                updateChart(data, this.letter)
+            },
+            move: function () {
+                return superMoveBot()
+            }
+        };
+        return player;
+    };
+} catch (ReferenceError) {
+        console.log(ReferenceError);
+}
 
 function initialize(){
     toPrint = {

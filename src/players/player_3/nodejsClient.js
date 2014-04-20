@@ -3,7 +3,7 @@ var net = require('net');
 var playerNode = require('./playernode.js');
 var bot = playerNode.newPlayer();
 
-var client = net.connect(5000,"192.168.0.12", function() {
+var client = net.connect(5000,"192.168.0.17", function() {
     console.log('bot connected');
     var user="player_3";//escribe tu nombre de usuario aca
     var token="5336d3e0ac4a33670400000e";//escribe tu token de autenticacion de bomberbot.com
