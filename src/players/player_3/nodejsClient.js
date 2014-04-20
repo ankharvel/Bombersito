@@ -5,12 +5,13 @@ var bot = playerNode.newPlayer();
 
 var client = net.connect(5000,"192.168.0.12", function() {
     console.log('bot connected');
-    var user="player_1";
-    var token="5336d3acac4a33670400000a";
+    var user="player_3";//escribe tu nombre de usuario aca
+    var token="5336d3e0ac4a33670400000e";//escribe tu token de autenticacion de bomberbot.com
     client.write(user+","+token+"\r\n");
 });
 
 client.on('data', function(data) {
+
     var info = data.toString().split(";");
     switch(info[0]){
         case "EMPEZO":
