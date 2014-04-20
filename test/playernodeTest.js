@@ -2,7 +2,7 @@ module ("Player node test")
 
 test("Get value", function(){
     var value = getValue("X");
-    equal(value, 6, "Value not correct");
+    equal(value, 6, "Value is correct");
 })
 
 //test("conversion to F", function(){

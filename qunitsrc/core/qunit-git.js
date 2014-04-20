@@ -27,7 +27,7 @@ var QUnit,
 		document: typeof window.document !== "undefined",
 		setTimeout: typeof window.setTimeout !== "undefined",
 		sessionStorage: (function() {
-			var x = "qunit-test-string";
+			var x = "qunitsrc-test-string";
 			try {
 				sessionStorage.setItem( x, x );
 				sessionStorage.removeItem( x );
@@ -343,16 +343,16 @@ extend( QUnit, {
 
 		if ( qunit ) {
 			qunit.innerHTML =
-				"<h1 id='qunit-header'>" + escapeText( document.title ) + "</h1>" +
-				"<h2 id='qunit-banner'></h2>" +
-				"<div id='qunit-testrunner-toolbar'></div>" +
-				"<h2 id='qunit-userAgent'></h2>" +
-				"<ol id='qunit-tests'></ol>";
+				"<h1 id='qunitsrc-header'>" + escapeText( document.title ) + "</h1>" +
+				"<h2 id='qunitsrc-banner'></h2>" +
+				"<div id='qunitsrc-testrunner-toolbar'></div>" +
+				"<h2 id='qunitsrc-userAgent'></h2>" +
+				"<ol id='qunitsrc-tests'></ol>";
 		}
 
-		tests = id( "qunit-tests" );
-		banner = id( "qunit-banner" );
-		result = id( "qunit-testresult" );
+		tests = id( "qunitsrc-tests" );
+		banner = id( "qunitsrc-banner" );
+		result = id( "qunitsrc-testresult" );
 
 		if ( tests ) {
 			tests.innerHTML = "";
@@ -368,7 +368,7 @@ extend( QUnit, {
 
 		if ( tests ) {
 			result = document.createElement( "p" );
-			result.id = "qunit-testresult";
+			result.id = "qunitsrc-testresult";
 			result.className = "result";
 			tests.parentNode.insertBefore( result, tests );
 			result.innerHTML = "Running...<br/>&nbsp;";
@@ -382,7 +382,7 @@ extend( QUnit, {
 	This method will throw an error in 2.0, and will be removed in 2.1
 	*/
 	reset: function() {
-		var fixture = id( "qunit-fixture" );
+		var fixture = id( "qunitsrc-fixture" );
 		if ( fixture ) {
 			fixture.innerHTML = config.fixture;
 		}
@@ -600,19 +600,19 @@ QUnit.load = function() {
 		}
 		config[ val.id ] = QUnit.urlParams[ val.id ];
 		if ( !val.value || typeof val.value === "string" ) {
-			urlConfigHtml += "<input id='qunit-urlconfig-" + escapeText( val.id ) +
+			urlConfigHtml += "<input id='qunitsrc-urlconfig-" + escapeText( val.id ) +
 				"' name='" + escapeText( val.id ) +
 				"' type='checkbox'" +
 				( val.value ? " value='" + escapeText( val.value ) + "'" : "" ) +
 				( config[ val.id ] ? " checked='checked'" : "" ) +
 				" title='" + escapeText( val.tooltip ) +
-				"'><label for='qunit-urlconfig-" + escapeText( val.id ) +
+				"'><label for='qunitsrc-urlconfig-" + escapeText( val.id ) +
 				"' title='" + escapeText( val.tooltip ) + "'>" + val.label + "</label>";
 		} else {
-			urlConfigHtml += "<label for='qunit-urlconfig-" + escapeText( val.id ) +
+			urlConfigHtml += "<label for='qunitsrc-urlconfig-" + escapeText( val.id ) +
 				"' title='" + escapeText( val.tooltip ) +
 				"'>" + val.label +
-				": </label><select id='qunit-urlconfig-" + escapeText( val.id ) +
+				": </label><select id='qunitsrc-urlconfig-" + escapeText( val.id ) +
 				"' name='" + escapeText( val.id ) +
 				"' title='" + escapeText( val.tooltip ) +
 				"'><option></option>";
@@ -654,7 +654,7 @@ QUnit.load = function() {
 	moduleNames.sort( function( a, b ) {
 		return a.localeCompare( b );
 	});
-	moduleFilterHtml += "<label for='qunit-modulefilter'>Module: </label><select id='qunit-modulefilter' name='modulefilter'><option value='' " +
+	moduleFilterHtml += "<label for='qunitsrc-modulefilter'>Module: </label><select id='qunitsrc-modulefilter' name='modulefilter'><option value='' " +
 		( config.module === undefined  ? "selected='selected'" : "" ) +
 		">< All Modules ></option>";
 
@@ -667,28 +667,28 @@ QUnit.load = function() {
 	moduleFilterHtml += "</select>";
 
 	// `userAgent` initialized at top of scope
-	userAgent = id( "qunit-userAgent" );
+	userAgent = id( "qunitsrc-userAgent" );
 	if ( userAgent ) {
 		userAgent.innerHTML = navigator.userAgent;
 	}
 
 	// `banner` initialized at top of scope
-	banner = id( "qunit-header" );
+	banner = id( "qunitsrc-header" );
 	if ( banner ) {
 		banner.innerHTML = "<a href='" + QUnit.url({ filter: undefined, module: undefined, testNumber: undefined }) + "'>" + banner.innerHTML + "</a> ";
 	}
 
 	// `toolbar` initialized at top of scope
-	toolbar = id( "qunit-testrunner-toolbar" );
+	toolbar = id( "qunitsrc-testrunner-toolbar" );
 	if ( toolbar ) {
 		// `filter` initialized at top of scope
 		filter = document.createElement( "input" );
 		filter.type = "checkbox";
-		filter.id = "qunit-filter-pass";
+		filter.id = "qunitsrc-filter-pass";
 
 		addEvent( filter, "click", function() {
 			var tmp,
-				ol = id( "qunit-tests" );
+				ol = id( "qunitsrc-tests" );
 
 			if ( filter.checked ) {
 				ol.className = ol.className + " hidepass";
@@ -698,24 +698,24 @@ QUnit.load = function() {
 			}
 			if ( defined.sessionStorage ) {
 				if (filter.checked) {
-					sessionStorage.setItem( "qunit-filter-passed-tests", "true" );
+					sessionStorage.setItem( "qunitsrc-filter-passed-tests", "true" );
 				} else {
-					sessionStorage.removeItem( "qunit-filter-passed-tests" );
+					sessionStorage.removeItem( "qunitsrc-filter-passed-tests" );
 				}
 			}
 		});
 
-		if ( config.hidepassed || defined.sessionStorage && sessionStorage.getItem( "qunit-filter-passed-tests" ) ) {
+		if ( config.hidepassed || defined.sessionStorage && sessionStorage.getItem( "qunitsrc-filter-passed-tests" ) ) {
 			filter.checked = true;
 			// `ol` initialized at top of scope
-			ol = id( "qunit-tests" );
+			ol = id( "qunitsrc-tests" );
 			ol.className = ol.className + " hidepass";
 		}
 		toolbar.appendChild( filter );
 
 		// `label` initialized at top of scope
 		label = document.createElement( "label" );
-		label.setAttribute( "for", "qunit-filter-pass" );
+		label.setAttribute( "for", "qunitsrc-filter-pass" );
 		label.setAttribute( "title", "Only show tests and assertions that fail. Stored in sessionStorage." );
 		label.innerHTML = "Hide passed tests";
 		toolbar.appendChild( label );
@@ -744,7 +744,7 @@ QUnit.load = function() {
 
 		if (numModules > 1) {
 			moduleFilter = document.createElement( "span" );
-			moduleFilter.setAttribute( "id", "qunit-modulefilter-container" );
+			moduleFilter.setAttribute( "id", "qunitsrc-modulefilter-container" );
 			moduleFilter.innerHTML = moduleFilterHtml;
 			addEvent( moduleFilter.lastChild, "change", function() {
 				var selectBox = moduleFilter.getElementsByTagName("select")[0],
@@ -762,7 +762,7 @@ QUnit.load = function() {
 	}
 
 	// `main` initialized at top of scope
-	main = id( "qunit-fixture" );
+	main = id( "qunitsrc-fixture" );
 	if ( main ) {
 		config.fixture = main.innerHTML;
 	}
@@ -823,8 +823,8 @@ function done() {
 	delete config.previousModule;
 
 	var i, key,
-		banner = id( "qunit-banner" ),
-		tests = id( "qunit-tests" ),
+		banner = id( "qunitsrc-banner" ),
+		tests = id( "qunitsrc-tests" ),
 		runtime = +new Date() - config.started,
 		passed = config.stats.all - config.stats.bad,
 		html = [
@@ -841,11 +841,11 @@ function done() {
 		].join( "" );
 
 	if ( banner ) {
-		banner.className = ( config.stats.bad ? "qunit-fail" : "qunit-pass" );
+		banner.className = ( config.stats.bad ? "qunitsrc-fail" : "qunitsrc-pass" );
 	}
 
 	if ( tests ) {
-		id( "qunit-testresult" ).innerHTML = html;
+		id( "qunitsrc-testresult" ).innerHTML = html;
 	}
 
 	if ( config.altertitle && defined.document && document.title ) {
@@ -862,7 +862,7 @@ function done() {
 		// `key` & `i` initialized at top of scope
 		for ( i = 0; i < sessionStorage.length; i++ ) {
 			key = sessionStorage.key( i++ );
-			if ( key.indexOf( "qunit-test-" ) === 0 ) {
+			if ( key.indexOf( "qunitsrc-test-" ) === 0 ) {
 				sessionStorage.removeItem( key );
 			}
 		}
@@ -1195,7 +1195,7 @@ Test.count = 0;
 Test.prototype = {
 	init: function() {
 		var a, b, li,
-			tests = id( "qunit-tests" );
+			tests = id( "qunitsrc-tests" );
 
 		if ( tests ) {
 			b = document.createElement( "strong" );
@@ -1210,7 +1210,7 @@ Test.prototype = {
 			li.appendChild( b );
 			li.appendChild( a );
 			li.className = "running";
-			li.id = this.id = "qunit-test-output" + testId++;
+			li.id = this.id = "qunitsrc-test-output" + testId++;
 
 			tests.appendChild( li );
 		}
@@ -1281,7 +1281,7 @@ Test.prototype = {
 	run: function() {
 		config.current = this;
 
-		var running = id( "qunit-testresult" );
+		var running = id( "qunitsrc-testresult" );
 
 		if ( running ) {
 			running.innerHTML = "Running: <br/>" + this.nameHtml;
@@ -1346,7 +1346,7 @@ Test.prototype = {
 			test = this,
 			good = 0,
 			bad = 0,
-			tests = id( "qunit-tests" );
+			tests = id( "qunitsrc-tests" );
 
 		this.runtime = +new Date() - this.started;
 		config.stats.all += this.assertions.length;
@@ -1354,7 +1354,7 @@ Test.prototype = {
 
 		if ( tests ) {
 			ol = document.createElement( "ol" );
-			ol.className = "qunit-assert-list";
+			ol.className = "qunitsrc-assert-list";
 
 			for ( i = 0; i < this.assertions.length; i++ ) {
 				assertion = this.assertions[i];
@@ -1376,14 +1376,14 @@ Test.prototype = {
 			// store result when possible
 			if ( QUnit.config.reorder && defined.sessionStorage ) {
 				if ( bad ) {
-					sessionStorage.setItem( "qunit-test-" + this.module + "-" + this.testName, bad );
+					sessionStorage.setItem( "qunitsrc-test-" + this.module + "-" + this.testName, bad );
 				} else {
-					sessionStorage.removeItem( "qunit-test-" + this.module + "-" + this.testName );
+					sessionStorage.removeItem( "qunitsrc-test-" + this.module + "-" + this.testName );
 				}
 			}
 
 			if ( bad === 0 ) {
-				addClass( ol, "qunit-collapsed" );
+				addClass( ol, "qunitsrc-collapsed" );
 			}
 
 			// `b` initialized at top of scope
@@ -1392,8 +1392,8 @@ Test.prototype = {
 
 			addEvent(b, "click", function() {
 				var next = b.parentNode.lastChild,
-					collapsed = hasClass( next, "qunit-collapsed" );
-				( collapsed ? removeClass : addClass )( next, "qunit-collapsed" );
+					collapsed = hasClass( next, "qunitsrc-collapsed" );
+				( collapsed ? removeClass : addClass )( next, "qunitsrc-collapsed" );
 			});
 
 			addEvent(b, "dblclick", function( e ) {
@@ -1473,7 +1473,7 @@ Test.prototype = {
 		// `bad` initialized at top of scope
 		// defer when previous test run passed, if storage is available
 		bad = QUnit.config.reorder && defined.sessionStorage &&
-						+sessionStorage.getItem( "qunit-test-" + this.module + "-" + this.testName );
+						+sessionStorage.getItem( "qunitsrc-test-" + this.module + "-" + this.testName );
 
 		if ( bad ) {
 			run();
