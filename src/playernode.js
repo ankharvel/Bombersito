@@ -1,13 +1,10 @@
 try {
     exports.newPlayer = function () {
         player = {
-            x: -1,
-            y: -1,
             letter: "Z",
             rows: [],
-            lastMov: "",
-            countDown: -1,
-            bombDown: -1,
+            data: "",
+//            data: "",
             updatePower: function () {
                 initialize()
             },
@@ -24,27 +21,20 @@ try {
         console.log(ReferenceError);
 }
 
+var bombDown, countDown, lastMov, x, y;
+var pMode, pUser;
+
 function initialize(){
-    toPrint = {
-        pMode: "",
-        pUser: "",
-        pDate: ""
-    };
     pMode = true;
     pUser = true;
-    pDate = false;
-    this.bombDown = 0;
-    this.countDown = 0;
+    bombDown = 0;
+    countDown = 0;
 }
 
 function superMoveBot(){
-    var d = new Date();
-    pDate ? console.log("Init date: " + d.getSeconds() + d.getMilliseconds()/1000) : pDate;
     var mov = evaluate(moveBot());
-    this.lastMov = mov;
+    lastMov = mov;
     pUser ? console.log("Soy__: " + this.letter + " ___voy: " + mov) : pUser;
-    d = new Date();
-    pDate ? console.log("Finish date: " + d.getSeconds() + d.getMilliseconds()/1000) : pDate;
     return mov;
 }
 
@@ -69,18 +59,18 @@ function moveBot(){
     printConsole(areBombs, areExits, totalLBlocks, totalTargets);
 
     if(areBombs){
-        this.countDown = 0;
-        if(this.bombDown <= 0){
-            this.bombDown = 2;
+        countDown = 0;
+        if(bombDown <= 0){
+            bombDown = 2;
         }
         return  henMode();
     }
 
-    if(this.countDown > 0){
+    if(countDown > 0){
         return hunterMode();
     }
 
-    if(this.countDown <= 0){
+    if(countDown <= 0){
         if(areVPBlocks()){
             return greedMode();
         }
@@ -100,8 +90,8 @@ function moveBot(){
 
 function henMode(){
     pMode ? console.log("henMode") : pMode;
-    if(this.bombDown > 0){
-        this.bombDown--;
+    if(bombDown > 0){
+        bombDown--;
     }
 
     var index = selectMaxIndex(compassRisk, false);
@@ -182,15 +172,15 @@ function killerMode(){
 
 function hunterMode(){
     pMode ? console.log("hunterMode") : pMode;
-    if(this.countDown<=0){
-        this.countDown = 3;
+    if(countDown<=0){
+        countDown = 3;
     } else if(calc_totals(closeTargets)>0){
         if(calc_exits(emptyCells)){
-            this.countDown = 0;
+            countDown = 0;
             return killerMode();
         }
     } else {
-        this.countDown--;
+        countDown--;
     }
 
     targets = ["A", "B", "C", "D"];
@@ -208,13 +198,13 @@ function hunterMode(){
 
 function obtainCompassMove(targetPos, throwBomb){
     var compassOrder = [];
-    if(this.x <= targetPos[0] && this.y <= targetPos[1]){
+    if(x <= targetPos[0] && y <= targetPos[1]){
         compassOrder = [2,3,0,1];
-    } else if(this.x <= targetPos[0] && this.y > targetPos[1]){
+    } else if(x <= targetPos[0] && y > targetPos[1]){
         compassOrder = [1,2,3,0];
-    } else if(this.x > targetPos[0] && this.y <= targetPos[1]){
+    } else if(x > targetPos[0] && y <= targetPos[1]){
         compassOrder = [3,0,1,2];
-    } else if(this.x > targetPos[0] && this.y > targetPos[1]){
+    } else if(x > targetPos[0] && y > targetPos[1]){
         compassOrder = [0,1,2,3];
     }
 
@@ -242,7 +232,7 @@ function obtainCompassMove(targetPos, throwBomb){
 function evaluate(mov){
     var areBombs = booleanResult(closeBombs);
     var areExits = calc_exits(emptyCells);
-    if(!areBombs && areExits && this.bombDown <= 0){
+    if(!areBombs && areExits && bombDown <= 0){
         switch (mov){
             case "P":
                 return mov;
@@ -260,16 +250,16 @@ function evaluate(mov){
                 return mov;
                 break;
             case "O":
-                return this.lastMov != "E" && anyFarRisk(this.x-1, this.y) ? mov : findNewPath(1);
+                return lastMov != "E" && anyFarRisk(x-1, y) ? mov : findNewPath(1);
                 break;
             case "N":
-                return this.lastMov != "S" && anyFarRisk(this.x, this.y-1) ? mov : findNewPath(2);
+                return lastMov != "S" && anyFarRisk(x, y-1) ? mov : findNewPath(2);
                 break;
             case "E":
-                return this.lastMov != "O" && anyFarRisk(this.x+1, this.y) ? mov : findNewPath(3);
+                return lastMov != "O" && anyFarRisk(x+1, y) ? mov : findNewPath(3);
                 break;
             case "S":
-                return this.lastMov != "N" && anyFarRisk(this.x, this.y+1) ? mov : findNewPath(0);
+                return lastMov != "N" && anyFarRisk(x, y+1) ? mov : findNewPath(0);
                 break;
             default:
                 return mov;
@@ -277,16 +267,16 @@ function evaluate(mov){
     } else {
         switch (mov){
             case "O":
-                return anyFarRisk(this.x-1, this.y) ? mov : findNewPath(1);
+                return anyFarRisk(x-1, y) ? mov : findNewPath(1);
                 break;
             case "N":
-                return anyFarRisk(this.x, this.y-1) ? mov : findNewPath(2);
+                return anyFarRisk(x, y-1) ? mov : findNewPath(2);
                 break;
             case "E":
-                return anyFarRisk(this.x+1, this.y) ? mov : findNewPath(3);
+                return anyFarRisk(x+1, y) ? mov : findNewPath(3);
                 break;
             case "S":
-                return anyFarRisk(this.x, this.y+1) ? mov : findNewPath(0);
+                return anyFarRisk(x, y+1) ? mov : findNewPath(0);
                 break;
             default:
                 return mov;
@@ -308,24 +298,24 @@ function areCloseBlocks(index, type){
     var newY;
     switch (index){
         case -1:
-            newX = this.x;
-            newY = this.y;
+            newX = x;
+            newY = y;
             break;
         case 0:
-            newX = this.x - 1;
-            newY = this.y;
+            newX = x - 1;
+            newY = y;
             break;
         case 1:
-            newX = this.x;
-            newY = this.y - 1;
+            newX = x;
+            newY = y - 1;
             break;
         case 2:
-            newX = this.x + 1;
-            newY = this.y;
+            newX = x + 1;
+            newY = y;
             break;
         case 3:
-            newX = this.x;
-            newY = this.y + 1;
+            newX = x;
+            newY = y + 1;
             break;
     }
 
@@ -394,8 +384,8 @@ function updateChart(data, letter){
     this.letter = letter;
     this.rows = data.split("\n");
     var pos = data.indexOf(letter)/2;
-    this.y = Math.floor(pos/this.rows.length);
-    this.x = pos%(this.rows).length;
+    y = Math.floor(pos/this.rows.length);
+    x = pos%(this.rows).length;
 }
 
 function findTarget(target, data){
@@ -408,18 +398,18 @@ function findTarget(target, data){
 }
 
 function fillStatistics(){
-    var wCells = [this.x-1, this.x-2, -1, this.y-1, this.y, this.y+1];
-    var nCells = [this.x-1, this.x, this.x+1, this.y-1, this.y-2, -1];
-    var eCells = [this.x+1, this.x+2, -1, this.y-1, this.y, this.y+1];
-    var sCells = [this.x-1, this.x, this.x+1, this.y+1, this.y+2, -1];
+    var wCells = [x-1, x-2, -1, y-1, y, y+1];
+    var nCells = [x-1, x, x+1, y-1, y-2, -1];
+    var eCells = [x+1, x+2, -1, y-1, y, y+1];
+    var sCells = [x-1, x, x+1, y+1, y+2, -1];
     var emptyRegex = /_|#|a|b|c|d|V|P/;
 
-    if(this.bombDown == 1){
+    if(bombDown == 1){
         compassRisk = [
-            this.lastMov == "E" ? getRisk(wCells) + 100: getRisk(wCells),
-            this.lastMov == "S" ? getRisk(nCells) + 100: getRisk(nCells),
-            this.lastMov == "O" ? getRisk(eCells) + 100: getRisk(eCells),
-            this.lastMov == "N" ? getRisk(sCells) + 100: getRisk(sCells)
+            lastMov == "E" ? getRisk(wCells) + 100: getRisk(wCells),
+            lastMov == "S" ? getRisk(nCells) + 100: getRisk(nCells),
+            lastMov == "O" ? getRisk(eCells) + 100: getRisk(eCells),
+            lastMov == "N" ? getRisk(sCells) + 100: getRisk(sCells)
         ];
     } else {
         compassRisk = [
@@ -434,10 +424,10 @@ function fillStatistics(){
         getLBlocks(wCells), getLBlocks(nCells), getLBlocks(eCells), getLBlocks(sCells)
     ];
     emptyCells = [
-        emptyRegex.test(getNear(this.x-1, this.y)),
-        emptyRegex.test(getNear(this.x, this.y-1)),
-        emptyRegex.test(getNear(this.x+1, this.y)),
-        emptyRegex.test(getNear(this.x, this.y+1))
+        emptyRegex.test(getNear(x-1, y)),
+        emptyRegex.test(getNear(x, y-1)),
+        emptyRegex.test(getNear(x+1, y)),
+        emptyRegex.test(getNear(x, y+1))
     ];
 
     closeBombs = [
@@ -597,10 +587,10 @@ function printConsole(areBombs, areExits, totalLBlocks, totalTargets){
 //    console.log("Are Exits = " + areExits);
 //    console.log("Are VP Blocks = " + areVPBlocks());
 //    console.log("Index = " + selectMaxIndex(compassRisk, true));
-//    console.log("Position = " + this.x + ", " + this.y);
-//    console.log("Last movement: " + this.lastMov);
+    console.log("Position = " + x + ", " + y);
+//    console.log("Last movement: " + lastMov);
 //    console.log(targetsPosition);
-//    console.log("Count down: " + this.countDown);
+    console.log("Count down: " + countDown);
     console.log(this.data);
 }
 
