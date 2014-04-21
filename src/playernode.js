@@ -4,7 +4,6 @@ try {
             letter: "Z",
             rows: [],
             data: "",
-//            data: "",
             updatePower: function () {
                 initialize()
             },

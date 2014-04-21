@@ -1,17 +1,17 @@
 var map1 =
     "X,X,X,X,X,X,X,X,X,X,X\n" +
-    "X,B,L,_,X,X,_,_,L,_,X\n" +
+    "X,_,L,_,X,X,_,_,L,_,X\n" +
     "X,_,X,_,X,_,X,L,P,_,X\n" +
     "X,_,_,_,L,X,_,#,L,_,X\n" +
     "X,X,_,L,_,_,#,#,#,C,X\n" +
     "X,_,_,X,_,X,L,#,L,L,X\n" +
     "X,_,L,_,X,P,_,_,X,_,X\n" +
-    "X,_,L,L,L,_,_,L,D,_,X\n" +
-    "X,_,V,L,_,X,L,L,_,#,X\n" +
-    "X,A,_,L,_,X,_,L,#,#,X\n" +
+    "X,B,L,L,L,_,_,L,D,_,X\n" +
+    "X,A,V,L,_,X,L,L,_,#,X\n" +
+    "X,_,1,L,_,X,_,L,#,#,X\n" +
     "X,X,X,X,X,X,X,X,X,X,X";
 
-var data, letter, rows, y, x;
+var data, letter, rows;
 var compassRisk, compassXBlocks, compassLBlocks, emptyCells, closeBombs, closeTargets, targetsPosition, targetPos, userLetter;
 
 QUnit.module ("Player node initialize", {
@@ -20,6 +20,11 @@ QUnit.module ("Player node initialize", {
         initialize();
         userLetter = "D";
         updateChart(map1, userLetter);
+    },
+    teardown: function() {
+        bombDown = 0;
+        userLetter = "D";
+        fillStatistics();
     }
 });
 
@@ -28,6 +33,7 @@ QUnit.module ("Player node initialize", {
         ok(pMode, "Print Mode initialize");
         equal(bombDown, 0, "Bomb down counter initialize");
         equal(countDown, 0, "Count down counter initialize");
+        expect(4);
     });
 
     QUnit.test("Update chart", function(){
@@ -48,8 +54,21 @@ QUnit.module ("Player node initialize", {
         propEqual(emptyCells, [false, false, true, true], "Assert Empty cells Ok " + x + ", " + y);
         propEqual(closeBombs, [false, false, false, false], "Assert Close Bombs Ok " + x + ", " + y);
         propEqual(closeTargets, [0, 0, 0, 0], "Assert Close Targets Ok " + x + ", " + y);
-        var targetsLocation = {"A": [[ 1,9]], "B": [[1, 1]], "C": [[9, 4]], "D": [[8, 7]]};
+        var targetsLocation = {"A": [[1,8]], "B": [[1, 7]], "C": [[9, 4]], "D": [[8, 7]]};
         propEqual(targetsPosition, targetsLocation, "Assert Target Locations Ok " + x + ", " + y);
+    });
+
+    QUnit.test("New Statistics with user A", function(){
+        userLetter = "A";
+        updateChart(map1, userLetter);
+        fillStatistics();
+        propEqual(closeBombs, [false, false, true, true], "New Assert Close Bombs Ok " + x + ", " + y);
+        propEqual(closeTargets, [0, 1, 0, 0], "New Assert Close Targets Ok " + x + ", " + y);
+        bombDown = 1;
+        propEqual(compassRisk, [18, 19, 98, 125], "New Assert Risk Ok " + x + ", " + y);
+        lastMov = "N";
+        fillStatistics();
+        propEqual(compassRisk, [18, 19, 98, 225], "New Assert Risk with last mov Ok " + x + ", " + y);
     });
 
 QUnit.module ("Helper Methods", {
@@ -84,26 +103,12 @@ QUnit.module ("Helper Methods", {
         var wCells = [x-1, x-2, -1, y-1, y, y+1];
         equal(getTotalByParameter(wCells, "Risk"), 9, "West Risk ok");
         var nCells = [x-1, x, x+1, y-1, y-2, -1];
-        equal(getTotalByParameter(nCells, "Risk"), 13, "Nort Risk ok");
+        equal(getTotalByParameter(nCells, "Risk"), 13, "North Risk ok");
         var eCells = [x+1, x+2, -1, y-1, y, y+1];
         equal(getTotalByParameter(eCells, "Risk"), 21, "Est Risk ok");
         var sCells = [x-1, x, x+1, y+1, y+2, -1];
         equal(getTotalByParameter(sCells, "Risk"), 8, "South Risk ok");
     });
 
-module( "module", {
-    pp: -1,
-    setup: function() {
-        pp = -1;
-        ok( pp == -1, "one extra assert per test" );
-    },
-    teardown: function() {
-        ok( true, "and one extra assert after each test" );
-    }
-});
-test( "test with setup and teardown", function() {
-//    expect( 3 );
-    ok(pp == -1, "tru es true")
-});
 
 
