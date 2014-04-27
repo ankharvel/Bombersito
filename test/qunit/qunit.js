@@ -1,12 +1,12 @@
 /*!
- * QUnit 1.14.1-pre
+ * QUnit 1.14.0
  * http://qunitjs.com/
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright 2013 jQuery Foundation and other contributors
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2014-04-17T19:17Z
+ * Date: 2014-01-31T16:40Z
  */
 
 (function( window ) {
@@ -169,7 +169,7 @@ QUnit = {
 		// ignore if start is called more often then stop
 		if ( config.semaphore < 0 ) {
 			config.semaphore = 0;
-			QUnit.pushFailure( "Called start() while already started (QUnit.config.semaphore was 0 already)", sourceFromStacktrace(2) );
+			QUnit.pushFailure( "Called start() while already started (QUnit.config.semaphore was 0 already)", null, sourceFromStacktrace(2) );
 			return;
 		}
 		// A slight delay, to avoid any current callbacks
@@ -1708,7 +1708,7 @@ QUnit.equiv = (function() {
 		parentsB = [],
 
 		getProto = Object.getPrototypeOf || function ( obj ) {
-			/* jshint camelcase: false, proto: true */
+			/*jshint camelcase:false */
 			return obj.__proto__;
 		},
 		callbacks = (function () {
