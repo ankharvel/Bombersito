@@ -46,7 +46,7 @@ function moveBot(){
         closeBombs: [],
         closeTargets: [],
         targetsPosition: {},
-        nextMov: ""
+        nextMove: ""
     };
     fillStatistics();
 
@@ -101,16 +101,16 @@ function findNewPath(index){
     var result = "P";
     switch (index){
         case 0:
-            result = ((compassRisk[index]<100 && emptyCells[index]) ?  "O" : findNewPath(1));
+            result = ((compassRisk[index]<90 && emptyCells[index]) ?  "O" : findNewPath(1));
             break;
         case 1:
-            result = ((compassRisk[index]<100 && emptyCells[index]) ?  "N" : findNewPath(2));
+            result = ((compassRisk[index]<90 && emptyCells[index]) ?  "N" : findNewPath(2));
             break;
         case 2:
-            result = ((compassRisk[index]<100 && emptyCells[index]) ?  "E" : findNewPath(3));
+            result = ((compassRisk[index]<90 && emptyCells[index]) ?  "E" : findNewPath(3));
             break;
         case 3:
-            result = ((compassRisk[index]<100 && emptyCells[index]) ?  "S" : "P");
+            result = ((compassRisk[index]<90 && emptyCells[index]) ?  "S" : "P");
             break;
         default:
             result = "P";
@@ -121,8 +121,8 @@ function findNewPath(index){
 
 function greedMode(){
     pMode ? console.log("greedMode") : pMode;
-    if(this.nextMov != "?"){
-        return this.nextMov;
+    if(this.nextMove != "?"){
+        return this.nextMove;
     }
     return henMode();
 }
@@ -235,48 +235,35 @@ function evaluate(mov){
         switch (mov){
             case "P":
                 return mov;
-                break;
             case "BO":
                 return mov;
-                break;
             case "BN":
                 return mov;
-                break;
             case "BE":
                 return mov;
-                break;
             case "BS":
                 return mov;
-                break;
             case "O":
                 return lastMov != "E" && anyFarRisk(x-1, y) ? mov : findNewPath(1);
-                break;
             case "N":
                 return lastMov != "S" && anyFarRisk(x, y-1) ? mov : findNewPath(2);
-                break;
             case "E":
                 return lastMov != "O" && anyFarRisk(x+1, y) ? mov : findNewPath(3);
-                break;
             case "S":
                 return lastMov != "N" && anyFarRisk(x, y+1) ? mov : findNewPath(0);
-                break;
             default:
-                return mov;
+                return "P";
         }
     } else {
         switch (mov){
             case "O":
                 return anyFarRisk(x-1, y) ? mov : findNewPath(1);
-                break;
             case "N":
                 return anyFarRisk(x, y-1) ? mov : findNewPath(2);
-                break;
             case "E":
                 return anyFarRisk(x+1, y) ? mov : findNewPath(3);
-                break;
             case "S":
                 return anyFarRisk(x, y+1) ? mov : findNewPath(0);
-                break;
             default:
                 return mov;
         }
@@ -319,16 +306,16 @@ function areCloseBlocks(index, type){
     }
 
     if(type.test(getNear(newX-1, newY))){
-        this.nextMov = (index == -1 ? "O" : "?");
+        this.nextMove = (index == -1 ? "O" : "?");
         return true;
     } else if(type.test(getNear(newX, newY-1))){
-        this.nextMov = (index == -1 ? "N" : "?");
+        this.nextMove = (index == -1 ? "N" : "?");
         return true;
     } else if(type.test(getNear(newX+1, newY))){
-        this.nextMov = (index == -1 ? "E" : "?");
+        this.nextMove = (index == -1 ? "E" : "?");
         return true;
     } else if(type.test(getNear(newX, newY+1))){
-        this.nextMov = (index == -1 ? "S" : "?");
+        this.nextMove = (index == -1 ? "S" : "?");
         return true;
     } else {
         return false;
@@ -512,18 +499,11 @@ function getNear(x,y) {
 
 function anyFarRisk(posX, posY){
     var bombRegex = /1/;
-    var bombArray2 = [
-        getNear(posX-2, posY),
-        getNear(posX, posY-2),
-        getNear(posX+2, posY),
-        getNear(posX, posY+2)
-    ];
-    console.log(bombArray2);
     var bombArray = [
-        bombRegex.test(getNear(posX-2, posY)),
-        bombRegex.test(getNear(posX, posY-2)),
-        bombRegex.test(getNear(posX+2, posY)),
-        bombRegex.test(getNear(posX, posY+2))
+        bombRegex.test(getNear(posX-2, posY)) || bombRegex.test(getNear(posX-3, posY)),
+        bombRegex.test(getNear(posX, posY-2)) || bombRegex.test(getNear(posX, posY-3)),
+        bombRegex.test(getNear(posX+2, posY)) || bombRegex.test(getNear(posX+3, posY)),
+        bombRegex.test(getNear(posX, posY+2)) || bombRegex.test(getNear(posX, posY+3))
     ];
     console.log(bombArray);
     console.log(!booleanResult(bombArray));
@@ -534,40 +514,31 @@ function getValue(cellValue) {
     switch (cellValue) {
         case "X":
             return 6;
-            break;
         case "#":
             return 1;
-            break;
         case "L":
             return 2;
-            break;
         case "_":
             return 1;
-            break;
         case "V":
             return -10;
-            break;
         case "P":
             return -10;
-            break;
         case "A":
         case "B":
         case "C":
         case "D":
             return 2;
-            break;
         case "3":
         case "2":
             return 50;
         case "1":
             return 100;
-            break;
         case "a":
         case "b":
         case "c":
         case "d":
             return 1;
-            break;
         default :
             return 10;
     }

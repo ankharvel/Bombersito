@@ -10,3 +10,8 @@ http://openwebinars.net/instalar-node-js-en-linux-y-windows/
 
 //Qunit
 npm install qunitjs
+
+npm install blanket
+--Mock
+npm install jack
+
