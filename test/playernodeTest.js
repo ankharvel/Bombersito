@@ -14,6 +14,8 @@ var map1 =
 var data, letter, rows;
 var compassRisk, compassXBlocks, compassLBlocks, emptyCells, closeBombs, closeTargets, targetsPosition, targetPos, userLetter, nextMove;
 var index, statistics;
+JsMockito.Integration.QUnit();
+JsHamcrest.Integration.QUnit();
 
 QUnit.module ("Player node initialize", {
     userLetter: "",
@@ -174,8 +176,18 @@ QUnit.module ("Client", {
     }
 });
 
+function divide(a,b) {
+    return a / b;
+}
+
     QUnit.test("Player test", function(){
-        expect(0);
+        mockFunc = mockFunction();
+        when(mockFunc)(anything()).then(function(arg) {
+            return "foo";
+        });
+        divide = mockFunc;
+        equal(divide(4,2), "foo", "Expected 2 as the result, result was: " + divide(4,2));
+        expect(1);
     });
 
 
