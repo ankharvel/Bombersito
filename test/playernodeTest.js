@@ -11,9 +11,23 @@ var map1 =
     "X,_,1,L,1,X,_,L,#,#,X\n" +
     "X,X,X,X,X,X,X,X,X,X,X";
 
+var map2 =
+    "X,X,X,X,X,X,X,X,X,X,X\n" +
+    "X,A,L,X,#,X,#,_,L,_,X\n" +
+    "X,B,_,#,#,#,#,L,L,_,X\n" +
+    "X,_,X,X,#,X,#,C,P,_,X\n" +
+    "X,X,_,#,#,#,#,#,#,#,X\n" +
+    "X,_,X,X,_,X,#,P,L,L,X\n" +
+    "X,_,L,_,X,P,#,_,X,_,X\n" +
+    "X,_,L,L,L,_,#,L,_,1,X\n" +
+    "X,L,V,L,_,X,L,L,D,_,X\n" +
+    "X,_,1,X,1,X,_,L,V,_,X\n" +
+    "X,X,X,X,X,X,X,X,X,X,X";
+
 var data, letter, rows;
 var compassRisk, compassXBlocks, compassLBlocks, emptyCells, closeBombs, closeTargets, targetsPosition, targetPos, userLetter, nextMove;
-var index, statistics;
+var index, statistics, varMove;
+var mockEvaluate;
 JsMockito.Integration.QUnit();
 JsHamcrest.Integration.QUnit();
 
@@ -87,6 +101,7 @@ QUnit.module ("Helper Methods", {
         equal(getNear(x-2, y-1), "_", "Near x-2, y-1");
         equal(getNear(x-2, y), "_", "Near x-2, y");
         equal(getNear(x-2, y+1), "L", "Near x-2, y+1");
+        equal(getNear(x-20, y+10), "Error", "Near Error Ok");
     });
 
     QUnit.test("Get risk value from cell", function(){
@@ -123,6 +138,28 @@ QUnit.module ("Helper Methods", {
         ok(!areVPBlocks(), "VP Blocks assert Ok");
         updateChart(map1, "A");
         ok(areVPBlocks(), "VP Blocks assert Ok");
+    });
+
+    QUnit.test("Select Max Index", function(){
+        updateChart(map2, "A");
+        fillStatistics();
+        equal(killerMode(), "P", "Select max -1 Ok");
+
+        equal(calc_max([0, 1, 2, 3]), 3, "Max Ok");
+        equal(calc_max([1, 1, 1, 1]), 1, "Max Ok");
+        equal(calc_max([-1, -8, -5, -10]), -1, "Max Ok");
+        equal(calc_max(undefined), undefined, "Max undefined Ok");
+        equal(calc_max(1/0), Infinity, "Max undefined Ok");
+
+        equal(calc_min([0, 1, 2, 3]), 0, "Min Ok");
+        equal(calc_min([1, 1, 1, 1]), 1, "Min Ok");
+        equal(calc_min([-1, -8, -5, -10]), -10, "Min Ok");
+    });
+
+    QUnit.test("Calculate total by array test", function(){
+        equal(calc_totals([1, 2, 3, 4]), 10, "Total Ok");
+        equal(calc_totals([-1, 5, -3, -1]), 0, "Total Ok");
+        equal(calc_totals([0, 30, 4]), 34, "Total Ok");
     });
 
 QUnit.module ("Move Methods", {
@@ -171,24 +208,74 @@ QUnit.module ("Move Methods", {
         equal(evaluate("SS"), "P",  "Evaluate move 'D' to SS Ok");
     });
 
-QUnit.module ("Client", {
+QUnit.module ("Play Mode Test", {
     setup: function(){
+        updateChart(map2, "C");
+        initialize();
+        fillStatistics();
+    }
+});
+    QUnit.test("Expected mode active", function(){
+        countDown = 1;
+        equal(moveBot(), hunterMode(), "Hunter mode active Ok");
+        countDown = 0;
+        equal(moveBot(), greedMode(), "Greed mode active Ok");
+        updateChart(map2, "B");
+        fillStatistics();
+        equal(moveBot(), killerMode(), "Killer mode active ok")
+    });
+
+QUnit.module ("Client", {
+    varMove: "",
+    setup: function(){
+        varMove = "E";
+        mockEvaluate = JsMockito.mockFunction();
+        JsMockito.when(mockEvaluate)(anything()).then(function(){
+            return varMove;
+        });
+        evaluate = mockEvaluate;
+    },
+    teardown: function() {
     }
 });
 
-function divide(a,b) {
-    return a / b;
-}
-
     QUnit.test("Player test", function(){
-        mockFunc = mockFunction();
-        when(mockFunc)(anything()).then(function(arg) {
-            return "foo";
-        });
-        divide = mockFunc;
-        equal(divide(4,2), "foo", "Expected 2 as the result, result was: " + divide(4,2));
-        expect(1);
+        superMoveBot();
+        varMove = "N";
+        superMoveBot();
+        varMove = "S";
+        superMoveBot();
+        propEqual(moveHistory, ["E", "N", "S"], "Move History Ok");
+        equal(lastMov, "S", "Last move Ok");
+        ok(moveHistory.indexOf("S", 1) == 2, "Contains Ok " + moveHistory.indexOf("S", 1));
+        expect(3);
     });
 
 
-
+//        mockCalcMax = JsMockito.mockFunction();
+//        JsMockito.when(mockCalcMax)([1, 2, 3, 4]).thenReturn()
+//
+//        var mockedFunc = mockFunction();
+//        when(mockedFunc)(0).thenReturn("f");
+//        when(mockedFunc)(1).thenThrow("An exception");
+//        when(mockedFunc)(2).then(function() { return 1+2 });
+//        when(mockedFunc)(anything()).then(function() { return 999 });
+//        equal(mockedFunc(0) , undefined, "Undefined Ok");
+//        throws(function(){mockedFunc(1);}, "Catch the exception Ok");
+//        assertThat(mockedFunc(999), typeOf('undefined'));
+//        when(mockedFunc)(3).thenReturn('a', 'b', 'c');
+//        assertThat(mockedFunc(3), equalTo('a'));
+//        assertThat(mockedFunc(3), equalTo('b'));
+//        assertThat(mockedFunc(3), equalTo('c'));
+//        assertThat(mockedFunc(3), equalTo('c'));
+//        when(mockedFunc)(4).thenReturn('a').thenReturn('b').then(function() { return 'c' });
+//        assertThat(mockedFunc(4), equalTo('a'));
+//        assertThat(mockedFunc(4), equalTo('b'));
+//        assertThat(mockedFunc(4), equalTo('c'));
+//        assertThat(mockedFunc(4), equalTo('c'));
+//        when(mockedFunc)(5).thenReturn('abcde');
+//        when(mockedFunc)(5, lessThan(0)).thenReturn('edcba');
+//        assertThat(mockedFunc(5, -1), equalTo('edcba'));
+//        assertThat(mockedFunc(5, 1), equalTo('abcde'));
+//        assertThat(mockedFunc(5), equalTo('abcde'));
+//        verify(mockedFunc)(0);
