@@ -39,21 +39,6 @@ function superMoveBot(){
     return mov;
 }
 
-function findLoop(){
-    var arr = [1,2,3,4,5,6,8,10,12,13,14,15,20,21,22,23,24,25,26,27,28,29,30];
-    var res = new Array();
-    res[0] = 0;
-
-    for(var i=1;i<arr.length;i++) {
-        res[i] = (arr[i] == arr[i-1] + 1) ? (res[i-1] + 1) : 0;
-    }
-
-    var maxLength = Math.max.apply({},res);
-    if(moveHistory.length >= 20){
-    }
-    return true;
-}
-
 function moveBot(){
     statistics = {
         compassRisk: [],
@@ -150,16 +135,12 @@ function bomberMode(){
     switch (index){
         case 0:
             return (areCloseBlocks(index, /L/) ? "BO" : "O");
-            break;
         case 1:
             return (areCloseBlocks(index, /L/) ? "BN" : "N");
-            break;
         case 2:
             return (areCloseBlocks(index, /L/) ? "BE" : "E");
-            break;
         case 3:
             return (areCloseBlocks(index, /L/) ? "BS" : "S");
-            break;
         default:
             return "P";
     }
@@ -171,16 +152,12 @@ function killerMode(){
     switch (index){
         case 0:
             return (areCloseBlocks(index, /A|B|C|D/) ? "BO" : "O");
-            break;
         case 1:
             return (areCloseBlocks(index, /A|B|C|D/) ? "BN" : "N");
-            break;
         case 2:
             return (areCloseBlocks(index, /A|B|C|D/) ? "BE" : "E");
-            break;
         case 3:
             return (areCloseBlocks(index, /A|B|C|D/) ? "BS" : "S");
-            break;
         default:
             return "P";
     }
@@ -190,7 +167,8 @@ function hunterMode(){
     pMode ? console.log("hunterMode") : pMode;
     if(countDown<=0){
         countDown = 3;
-    } else if(calc_totals(closeTargets)>0){
+    }
+    if(calc_totals(closeTargets)>0){
         if(calc_exits(emptyCells)){
             countDown = 0;
             return killerMode();
@@ -229,16 +207,12 @@ function obtainCompassMove(targetPos, throwBomb){
             switch (compassOrder[i]){
                 case 0:
                     return throwBomb ? "BO" : "O";
-                    break;
                 case 1:
                     return throwBomb ? "BN" : "N";
-                    break;
                 case 2:
                     return throwBomb ? "BE" : "E";
-                    break;
                 case 3:
                     return throwBomb ? "BS" : "S";
-                    break;
             }
         }
     }

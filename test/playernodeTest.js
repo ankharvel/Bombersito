@@ -24,9 +24,22 @@ var map2 =
     "X,_,1,X,1,X,_,L,V,_,X\n" +
     "X,X,X,X,X,X,X,X,X,X,X";
 
+var map3 =
+    "X,X,X,X,X,X,X,X,X,X,X\n" +
+    "X,_,_,_,_,_,_,_,_,_,X\n" +
+    "X,_,A,_,_,_,_,_,_,_,X\n" +
+    "X,_,_,_,_,_,X,_,_,_,X\n" +
+    "X,_,_,_,_,_,_,_,_,_,X\n" +
+    "X,_,_,_,1,_,_,_,_,_,X\n" +
+    "X,_,_,_,_,_,_,X,_,_,X\n" +
+    "X,_,_,_,B,_,_,_,_,_,X\n" +
+    "X,_,_,_,_,_,_,_,_,_,X\n" +
+    "X,_,_,_,_,_,_,_,_,_,X\n" +
+    "X,X,X,X,X,X,X,X,X,X,X";
+
 var data, letter, rows;
 var compassRisk, compassXBlocks, compassLBlocks, emptyCells, closeBombs, closeTargets, targetsPosition, targetPos, userLetter, nextMove;
-var index, statistics, varMove;
+var index, statistics, varMove, targets;
 var mockEvaluate;
 JsMockito.Integration.QUnit();
 JsHamcrest.Integration.QUnit();
@@ -162,6 +175,23 @@ QUnit.module ("Helper Methods", {
         equal(calc_totals([0, 30, 4]), 34, "Total Ok");
     });
 
+    QUnit.test("Are close blocks test", function(){
+        ok(areCloseBlocks(-1, /_/));
+        equal(nextMove, "E", "Next move Ok");
+        ok(areCloseBlocks(-1, /X/));
+        equal(nextMove, "N", "Next move Ok");
+        ok(areCloseBlocks(-1, /L/));
+        equal(nextMove, "O", "Next move Ok");
+        ok(areCloseBlocks(0, /L/));
+        equal(nextMove, "?", "Next move Ok");
+        ok(areCloseBlocks(0, /_/));
+        ok(areCloseBlocks(1, /_/));
+        ok(areCloseBlocks(2, /X/));
+        ok(areCloseBlocks(2, /_/));
+        ok(areCloseBlocks(2, /#/));
+        ok(!areCloseBlocks(2, /V/), "Not find any Ok");
+    });
+
 QUnit.module ("Move Methods", {
     setup: function(){
         updateChart(map1, "A");
@@ -208,6 +238,45 @@ QUnit.module ("Move Methods", {
         equal(evaluate("SS"), "P",  "Evaluate move 'D' to SS Ok");
     });
 
+    QUnit.test("New Path test", function(){
+        compassRisk = [50, 40, 30, 20];
+        emptyCells = [true, true, true, true];
+        equal(findNewPath(0), "O", "Path Ok");
+        equal(findNewPath(1), "N", "Path Ok");
+        equal(findNewPath(2), "E", "Path Ok");
+        equal(findNewPath(3), "S", "Path Ok");
+        equal(findNewPath(4), "P", "Path Ok");
+        equal(findNewPath(-99), "P", "Path Ok");
+        compassRisk = [99, 40, 30, 20];
+        equal(findNewPath(0), "N", "Path Ok");
+        compassRisk = [4, 140, 30, 20];
+        equal(findNewPath(1), "E", "Path Ok");
+        compassRisk = [9, 40, 130, 20];
+        equal(findNewPath(2), "S", "Path Ok");
+        compassRisk = [9, 40, 30, 120];
+        equal(findNewPath(3), "P", "Path Ok");
+    });
+
+    QUnit.test("Obtain compass move test", function(){
+        updateChart(map3, "B");
+        fillStatistics();
+        var targetPos = [1, 1];
+        equal(obtainCompassMove(targetPos, true), "BO", "Move Ok");
+        equal(obtainCompassMove(targetPos, false), "O", "Move Ok");
+        targetPos = [1, 9];
+        equal(obtainCompassMove(targetPos, true), "BS", "Move Ok");
+        equal(obtainCompassMove(targetPos, false), "S", "Move Ok");
+        targetPos = [9, 1];
+        equal(obtainCompassMove(targetPos, true), "BN", "Move Ok");
+        equal(obtainCompassMove(targetPos, false), "N", "Move Ok");
+        targetPos = [9, 9];
+        equal(obtainCompassMove(targetPos, true), "BE", "Move Ok");
+        equal(obtainCompassMove(targetPos, false), "E", "Move Ok");
+        targetPos = findTarget("B", map3);
+        emptyCells = [false, false, false, false];
+        equal(obtainCompassMove(targetPos, true), "P", "Move Ok");
+    });
+
 QUnit.module ("Play Mode Test", {
     setup: function(){
         updateChart(map2, "C");
@@ -222,33 +291,119 @@ QUnit.module ("Play Mode Test", {
         equal(moveBot(), greedMode(), "Greed mode active Ok");
         updateChart(map2, "B");
         fillStatistics();
-        equal(moveBot(), killerMode(), "Killer mode active ok")
+        equal(moveBot(), killerMode(), "Killer mode active Ok");
+        updateChart(map1, "C");
+        fillStatistics();
+        equal(moveBot(), bomberMode(), "Bomber mode active Ok");
+        updateChart(map3, "A");
+        fillStatistics();
+        equal(moveBot(), hunterMode(), "Hunter mode active Ok");
+        updateChart(map3, "B");
+        fillStatistics();
+        equal(moveBot(), henMode(), "Hen mode active Ok");
+    });
+
+    QUnit.test("Hen mode test", function(){
+        bombDown = 1;
+        compassRisk = [10, 20, 30, 40];
+        emptyCells = [true, true, true, true];
+        equal(henMode(), "O");
+        equal(bombDown, 0);
+        emptyCells = [false, true, true, true];
+        equal(henMode(), "N");
+        emptyCells = [false, false, true, true];
+        equal(henMode(), "E");
+        compassRisk = [110, 20, 30, 40];
+        emptyCells = [true, true, true, true];
+        equal(henMode(), "N");
+        compassRisk = [110, 120, 30, 40];
+        emptyCells = [true, true, false, true];
+        equal(henMode(), "S");
+    });
+
+    QUnit.test("Greed mode test", function(){
+        nextMove = "N";
+        equal(greedMode(), "N");
+        nextMove = "?";
+        compassRisk = [110, 120, 30, 40];
+        emptyCells = [true, true, false, true];
+        equal(greedMode(), "S");
+    });
+
+    QUnit.test("Bomber mode test", function(){
+        updateChart(map1, "D");
+        emptyCells = [true, true, true, true];
+        compassLBlocks = [1, 2, 3, 4];
+        equal(bomberMode(), "BS", "Move Ok");
+        compassLBlocks = [10, 18, 3, 4];
+        equal(bomberMode(), "BN", "Move Ok");
+        compassLBlocks = [10, 18, 33, 4];
+        updateChart(map2, "B");
+        equal(bomberMode(), "BE", "Move Ok");
+        emptyCells = [false, false, false, false];
+        equal(bomberMode(), "P", "Move Ok");
+    });
+
+    QUnit.test("Killer mode test", function(){
+        updateChart(map3, "A");
+        fillStatistics();
+        closeTargets = [1, 0, 0, 1];
+        equal(killerMode(), "BO", "Move Ok");
+        closeTargets = [1, 3, 0, 1];
+        equal(killerMode(), "BN", "Move Ok");
+        closeTargets = [1, 0, 4, 1];
+        equal(killerMode(), "BE", "Move Ok");
+        closeTargets = [1, 0, 0, 10];
+        equal(killerMode(), "BS", "Move Ok");
+    });
+
+    QUnit.test("Hunter mode test", function(){
+        updateChart(map3, "A");
+        fillStatistics();
+        countDown = -1;
+        closeTargets = [0, 1, 0, 1];
+        equal(hunterMode(), killerMode(), "Move Ok");
+        equal(countDown, 0, "Counter Ok");
+        equal(calc_exits(emptyCells), true);
+        countDown = -1;
+        closeTargets = [0, 0, 0, 0];
+        var targetBPosition = findTarget("B", map3);
+        equal(hunterMode(), obtainCompassMove(targetBPosition, false), "Move Ok");
+        equal(countDown, 2, "Counter Ok");
     });
 
 QUnit.module ("Client", {
     varMove: "",
     setup: function(){
-        varMove = "E";
-        mockEvaluate = JsMockito.mockFunction();
-        JsMockito.when(mockEvaluate)(anything()).then(function(){
-            return varMove;
-        });
-        evaluate = mockEvaluate;
+//        varMove = "E";
+//        mockEvaluate = JsMockito.mockFunction();
+//        JsMockito.when(mockEvaluate)(anything()).then(function(){
+//            return varMove;
+//        });
+//        evaluate = mockEvaluate;
     },
     teardown: function() {
     }
 });
 
     QUnit.test("Player test", function(){
-        superMoveBot();
-        varMove = "N";
-        superMoveBot();
-        varMove = "S";
-        superMoveBot();
-        propEqual(moveHistory, ["E", "N", "S"], "Move History Ok");
-        equal(lastMov, "S", "Last move Ok");
-        ok(moveHistory.indexOf("S", 1) == 2, "Contains Ok " + moveHistory.indexOf("S", 1));
-        expect(3);
+        expect(0);
+        this.player.letter = "K";
+        equal(this.player.letter, "K", "Letter ok");
+//        superMoveBot();
+//        varMove = "N";
+//        superMoveBot();
+//        varMove = "S";
+//        superMoveBot();
+//        propEqual(moveHistory, ["E", "N", "S"], "Move History Ok");
+//        equal(lastMov, "S", "Last move Ok");
+//        ok(moveHistory.indexOf("S", 1) == 2, "Contains Ok " + moveHistory.indexOf("S", 1));
+//        equal(playerNode.newPlayer(), "");
+//        try{
+//            var player = exports.newPlayer();
+//            player.letter = "K";
+//            equal(player.letter, "K", "alfo");
+//        }catch(ex) {}
     });
 
 
