@@ -62,7 +62,8 @@ QUnit.module ("Player node initialize", {
         ok(pMode, "Print Mode initialize");
         equal(bombDown, 0, "Bomb down counter initialize");
         equal(countDown, 0, "Count down counter initialize");
-        expect(4);
+        equal(lastMov, undefined, "Last move is undefined");
+        expect(5);
     });
 
     QUnit.test("Update chart", function(){
@@ -333,8 +334,11 @@ QUnit.module ("Play Mode Test", {
         updateChart(map2, "B");
         fillStatistics();
         equal(moveBot(), killerMode(), "Killer mode active Ok");
+        lastMov = undefined;
+        equal(moveBot(), hunterMode(), "Killer mode not active Ok");
         updateChart(map1, "C");
         fillStatistics();
+        lastMov = "BO";
         equal(moveBot(), bomberMode(), "Bomber mode active Ok");
         updateChart(map3, "A");
         fillStatistics();

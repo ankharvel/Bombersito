@@ -76,7 +76,7 @@ function moveBot(){
             return greedMode();
         }
 
-        if(areExits && (totalLBlocks>0 || totalTargets>0)){
+        if(areExits && (totalLBlocks>0 || totalTargets>0) && lastMov != undefined){
             if(totalTargets>0){
                 return killerMode();
             } else {
@@ -358,18 +358,18 @@ function retrieveTargetMap(target){
     var count = 0;
     var index = 0;
     var offset = 0;
-    var forbiddenCells = {};
+    var targetMap = {};
     for(;;){
         index = data.indexOf(target, offset);
         if(index != -1){
             count++;
-            forbiddenCells[count] = findTargetWithOffset(target, data, offset);
+            targetMap[count] = findTargetWithOffset(target, data, offset);
             offset = index+1;
         } else {
             break;
         }
     }
-    return forbiddenCells;
+    return targetMap;
 }
 
 function updateChart(data, letter){
@@ -445,9 +445,6 @@ function fillStatistics(){
     targetsPosition['B'] = [findTarget("B", this.data)];
     targetsPosition['C'] = [findTarget("C", this.data)];
     targetsPosition['D'] = [findTarget("D", this.data)];
-
-//    var forbiddenCells = {};
-//    this.data.
 
 }
 
