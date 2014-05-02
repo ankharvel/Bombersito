@@ -40,7 +40,6 @@ var map3 =
 var data, letter, rows;
 var compassRisk, compassXBlocks, compassLBlocks, emptyCells, closeBombs, closeTargets, targetsPosition, targetPos, userLetter, nextMove;
 var index, statistics, varMove, targets;
-var mockEvaluate;
 JsMockito.Integration.QUnit();
 JsHamcrest.Integration.QUnit();
 
@@ -371,66 +370,3 @@ QUnit.module ("Play Mode Test", {
         equal(hunterMode(), obtainCompassMove(targetBPosition, false), "Move Ok");
         equal(countDown, 2, "Counter Ok");
     });
-
-QUnit.module ("Client", {
-    varMove: "",
-    setup: function(){
-//        varMove = "E";
-//        mockEvaluate = JsMockito.mockFunction();
-//        JsMockito.when(mockEvaluate)(anything()).then(function(){
-//            return varMove;
-//        });
-//        evaluate = mockEvaluate;
-    },
-    teardown: function() {
-    }
-});
-
-    QUnit.test("Player test", function(){
-        expect(0);
-        this.player.letter = "K";
-        equal(this.player.letter, "K", "Letter ok");
-//        superMoveBot();
-//        varMove = "N";
-//        superMoveBot();
-//        varMove = "S";
-//        superMoveBot();
-//        propEqual(moveHistory, ["E", "N", "S"], "Move History Ok");
-//        equal(lastMov, "S", "Last move Ok");
-//        ok(moveHistory.indexOf("S", 1) == 2, "Contains Ok " + moveHistory.indexOf("S", 1));
-//        equal(playerNode.newPlayer(), "");
-//        try{
-//            var player = exports.newPlayer();
-//            player.letter = "K";
-//            equal(player.letter, "K", "alfo");
-//        }catch(ex) {}
-    });
-
-
-//        mockCalcMax = JsMockito.mockFunction();
-//        JsMockito.when(mockCalcMax)([1, 2, 3, 4]).thenReturn()
-//
-//        var mockedFunc = mockFunction();
-//        when(mockedFunc)(0).thenReturn("f");
-//        when(mockedFunc)(1).thenThrow("An exception");
-//        when(mockedFunc)(2).then(function() { return 1+2 });
-//        when(mockedFunc)(anything()).then(function() { return 999 });
-//        equal(mockedFunc(0) , undefined, "Undefined Ok");
-//        throws(function(){mockedFunc(1);}, "Catch the exception Ok");
-//        assertThat(mockedFunc(999), typeOf('undefined'));
-//        when(mockedFunc)(3).thenReturn('a', 'b', 'c');
-//        assertThat(mockedFunc(3), equalTo('a'));
-//        assertThat(mockedFunc(3), equalTo('b'));
-//        assertThat(mockedFunc(3), equalTo('c'));
-//        assertThat(mockedFunc(3), equalTo('c'));
-//        when(mockedFunc)(4).thenReturn('a').thenReturn('b').then(function() { return 'c' });
-//        assertThat(mockedFunc(4), equalTo('a'));
-//        assertThat(mockedFunc(4), equalTo('b'));
-//        assertThat(mockedFunc(4), equalTo('c'));
-//        assertThat(mockedFunc(4), equalTo('c'));
-//        when(mockedFunc)(5).thenReturn('abcde');
-//        when(mockedFunc)(5, lessThan(0)).thenReturn('edcba');
-//        assertThat(mockedFunc(5, -1), equalTo('edcba'));
-//        assertThat(mockedFunc(5, 1), equalTo('abcde'));
-//        assertThat(mockedFunc(5), equalTo('abcde'));
-//        verify(mockedFunc)(0);

@@ -84,9 +84,7 @@ function moveBot(){
             }
         }
     }
-
     return hunterMode();
-
 }
 
 function henMode(){
