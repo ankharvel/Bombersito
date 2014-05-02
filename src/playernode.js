@@ -562,20 +562,7 @@ function getValue(cellValue) {
 
 function printConsole(areBombs, areExits, totalLBlocks, totalTargets){
 //    console.log("Risk = " + compassRisk);
-//    console.log("XBlocks = " + compassXBlocks);
-//    console.log("LBlocks = " + compassLBlocks);
-//    console.log("EmptyCells = " + emptyCells);
-//    console.log("CloseBombs = " + closeBombs);
-//    console.log("CloseTargets = " + closeTargets);
-//    console.log("Total L Blocks = " + totalLBlocks);
-//    console.log("Are bombs = " + areBombs);
-//    console.log("Are targets = " + totalTargets>0);
-//    console.log("Are Exits = " + areExits);
-//    console.log("Are VP Blocks = " + areVPBlocks());
-//    console.log("Index = " + selectMaxIndex(compassRisk, true));
     console.log("Position = " + x + ", " + y);
-//    console.log("Last movement: " + lastMov);
-//    console.log(targetsPosition);
     console.log("Count down: " + countDown);
     console.log(this.data);
 }
