@@ -354,6 +354,24 @@ function calc_exits(array) {
     return eval("((" + array.join(" ? 1 : 0) + (") + " ? 1 : 0));") >= 2;
 }
 
+function retrieveTargetMap(target){
+    var count = 0;
+    var index = 0;
+    var offset = 0;
+    var forbiddenCells = {};
+    for(;;){
+        index = data.indexOf(target, offset);
+        if(index != -1){
+            count++;
+            forbiddenCells[count] = findTargetWithOffset(target, data, offset);
+            offset = index+1;
+        } else {
+            break;
+        }
+    }
+    return forbiddenCells;
+}
+
 function updateChart(data, letter){
     this.data = data;
     this.letter = letter;
@@ -366,6 +384,15 @@ function updateChart(data, letter){
 function findTarget(target, data){
     targetPos = [];
     var pos = data.indexOf(target)/2;
+    var posX = pos%(this.rows).length;
+    var posY = Math.floor(pos/this.rows.length);
+    targetPos = targetPos.concat([posX, posY]);
+    return targetPos;
+}
+
+function findTargetWithOffset(target, data, offset){
+    targetPos = [];
+    var pos = data.indexOf(target, offset)/2;
     var posX = pos%(this.rows).length;
     var posY = Math.floor(pos/this.rows.length);
     targetPos = targetPos.concat([posX, posY]);
@@ -418,6 +445,9 @@ function fillStatistics(){
     targetsPosition['B'] = [findTarget("B", this.data)];
     targetsPosition['C'] = [findTarget("C", this.data)];
     targetsPosition['D'] = [findTarget("D", this.data)];
+
+//    var forbiddenCells = {};
+//    this.data.
 
 }
 

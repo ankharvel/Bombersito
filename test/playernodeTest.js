@@ -191,6 +191,48 @@ QUnit.module ("Helper Methods", {
         ok(!areCloseBlocks(2, /V/), "Not find any Ok");
     });
 
+    QUnit.test("Find target Map", function(){
+        updateChart(map1, "A");
+        var target = "#";
+        var targetMap = retrieveTargetMap(target);
+        var cellKeys = [];
+        for(var i in targetMap){
+            cellKeys = cellKeys.concat(i);
+        }
+        var positions = { "1":[7,3], "2":[6,4], "3":[7,4], "4": [8,4], "5":[7,5], "6":[9,8], "7":[8,9], "8":[9,9]};
+        propEqual(cellKeys, ["1", "2", "3", "4", "5", "6", "7", "8"], "Assert kwys Ok");
+        propEqual(targetMap, positions, "Assert target positions Ok");
+
+        target = "P";
+        targetMap = retrieveTargetMap(target);
+        positions = { "1":[8, 2], "2":[5, 6]};
+        propEqual(targetMap, positions, "Assert target positions Ok");
+
+        updateChart(map2, "A");
+        target = "V";
+        targetMap = retrieveTargetMap(target);
+        positions = { "1":[2, 8], "2":[8, 9]};
+        propEqual(targetMap, positions, "Assert target positions Ok");
+
+    });
+
+    QUnit.test("Find target with offset", function(){
+        updateChart(map1, "A");
+        var target = "#";
+        propEqual(findTargetWithOffset(target, map1, 0), [7,3], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 81), [6,4], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 101), [7,4], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 103), [8,4], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 105), [7,5], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 125), [9,8], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 195), [8,9], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 215), [9,9], "Target position " + target + " Ok");
+
+        target = "P";
+        propEqual(findTargetWithOffset(target, map1, 0), [8,2], "Target position " + target + " Ok");
+        propEqual(findTargetWithOffset(target, map1, 61), [5,6], "Target position " + target + " Ok");
+    });
+
 QUnit.module ("Move Methods", {
     setup: function(){
         updateChart(map1, "A");
